@@ -1,0 +1,90 @@
+.czech-map-container {
+  width: 100%;
+}
+
+.czech-map-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.map-region {
+  fill: #e8edf5;
+  stroke: #fff;
+  stroke-width: 1.5;
+  cursor: pointer;
+  transition: fill 0.18s ease;
+}
+
+.map-region.has-contacts {
+  fill: #c7d2fe;
+}
+
+.map-region.hovered {
+  fill: #a5b4fc;
+}
+
+.map-region.selected {
+  fill: #4f46e5;
+  stroke: #fff;
+  stroke-width: 2;
+}
+
+.map-region.selected.hovered {
+  fill: #4338ca;
+}
+
+.map-label {
+  font-size: 7.5px;
+  font-family: 'Inter', sans-serif;
+  fill: #334155;
+  font-weight: 600;
+  pointer-events: none;
+  user-select: none;
+  paint-order: stroke;
+  stroke: #fff;
+  stroke-width: 2.5px;
+  stroke-linejoin: round;
+}
+
+g:has(.map-region.selected) .map-label {
+  fill: #fff;
+  stroke: rgba(79,70,229,0.4);
+}
+
+.map-count {
+  font-size: 8px;
+  fill: #4f46e5;
+  font-weight: 800;
+  paint-order: stroke;
+  stroke: #fff;
+  stroke-width: 2px;
+}
+
+g:has(.map-region.selected) .map-count {
+  fill: #e0e7ff;
+  stroke: rgba(79,70,229,0.3);
+}
+
+.map-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 60px 20px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.map-loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

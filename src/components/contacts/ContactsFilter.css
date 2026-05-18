@@ -1,0 +1,94 @@
+.contacts-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.filter-search {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 0 12px;
+  border: 1px solid var(--border);
+}
+
+.filter-search-icon {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.filter-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 9px 0;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.filter-input::placeholder {
+  color: var(--text-muted);
+}
+
+.filter-selects {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-select {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-primary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.filter-select:focus {
+  border-color: var(--primary);
+}
+
+.filter-clear {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: #fee2e2;
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  transition: background 0.15s;
+}
+
+.filter-clear:hover {
+  background: #fecaca;
+}
+
+@media (max-width: 768px) {
+  .contacts-filter {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-search {
+    width: 100%;
+  }
+
+  .filter-selects {
+    width: 100%;
+  }
+
+  .filter-select {
+    flex: 1;
+  }
+}

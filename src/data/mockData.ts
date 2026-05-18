@@ -1,0 +1,28 @@
+import type { Contact } from '../types';
+
+export const mockContacts: Contact[] = [
+  { id: '1', name: 'Jan Novák', phone: '+420 602 111 222', country: 'CZ', region: 'JHM', city: 'Brno', street: 'Náměstí Svobody 1', materials: ['elektronika', 'desky', 'mobily', 'kabely', 'cpu'], smsEnabled: true },
+  { id: '2', name: 'Petra Svobodová', phone: '+420 731 333 444', country: 'CZ', region: 'PHA', city: 'Praha 1', street: 'Václavské náměstí 12', materials: ['mobily'], smsEnabled: true },
+  { id: '3', name: 'Tomáš Dvořák', phone: '+420 777 555 666', country: 'CZ', region: 'MSK', city: 'Ostrava', street: 'Masarykovo nám. 5', materials: ['desky', 'konektory'], smsEnabled: false },
+  { id: '4', name: 'Marie Horáková', phone: '+420 603 777 888', country: 'CZ', region: 'STC', city: 'Kladno', street: 'T. G. Masaryka 3', materials: ['kontakty', 'desky'], smsEnabled: true },
+  { id: '5', name: 'Pavel Procházka', phone: '+420 724 999 000', country: 'CZ', region: 'PLK', city: 'Plzeň', street: 'Náměstí Republiky 8', materials: ['konektory', 'elektronika', 'desky', 'mobily', 'ram', 'hdd'], smsEnabled: true },
+  { id: '6', name: 'Eva Nováková', phone: '+420 608 121 314', country: 'CZ', region: 'JHC', city: 'České Budějovice', street: 'Budějovická 22', materials: ['elektronika'], smsEnabled: false },
+  { id: '7', name: 'Jiří Blažek', phone: '+420 737 151 617', country: 'CZ', region: 'OLK', city: 'Olomouc', street: 'Horní náměstí 1', materials: ['mobily', 'elektronika'], smsEnabled: true },
+  { id: '8', name: 'Lucie Marková', phone: '+420 775 181 920', country: 'CZ', region: 'HKK', city: 'Hradec Králové', street: 'Gočárova třída 4', materials: ['desky'], smsEnabled: true },
+  { id: '9', name: 'Martin Kopecký', phone: '+420 606 212 223', country: 'CZ', region: 'ZLK', city: 'Zlín', street: 'Náměstí Míru 12', materials: ['ostatní', 'kontakty'], smsEnabled: false },
+  { id: '10', name: 'Hana Veselá', phone: '+420 732 242 526', country: 'CZ', region: 'KVK', city: 'Karlovy Vary', street: 'T. G. Masaryka 7', materials: ['kontakty'], smsEnabled: true },
+  { id: '11', name: 'Ondřej Král', phone: '+420 778 272 829', country: 'CZ', region: 'ULK', city: 'Ústí nad Labem', street: 'Mírové náměstí 3', materials: ['elektronika', 'konektory', 'desky', 'kabely'], smsEnabled: true },
+  { id: '12', name: 'Zuzana Pokorná', phone: '+420 604 303 132', country: 'CZ', region: 'LBK', city: 'Liberec', street: 'Dr. E. Beneše 21', materials: ['mobily'], smsEnabled: false },
+  { id: '13', name: 'Radek Šimánek', phone: '+420 723 333 435', country: 'CZ', region: 'PAK', city: 'Pardubice', street: 'Pernštýnské nám. 1', materials: ['konektory', 'mobily'], smsEnabled: true },
+  { id: '14', name: 'Alena Fišerová', phone: '+420 776 363 738', country: 'CZ', region: 'VYS', city: 'Jihlava', street: 'Masarykovo nám. 25', materials: ['desky', 'elektronika'], smsEnabled: true },
+  { id: '15', name: 'Klaus Weber', phone: '+49 172 123 4567', country: 'zahraničí', euCountry: 'DE', city: 'München', street: 'Marienplatz 1', materials: ['elektronika', 'desky'], smsEnabled: false },
+  { id: '16', name: 'Anna Kovářová', phone: '+420 601 393 940', country: 'CZ', region: 'JHM', city: 'Znojmo', street: 'Obroková 10', materials: ['kontakty', 'elektronika'], smsEnabled: true },
+  { id: '17', name: 'Michal Fiala', phone: '+420 730 414 243', country: 'CZ', region: 'MSK', city: 'Opava', street: 'Horní náměstí 69', materials: ['mobily', 'konektory'], smsEnabled: true },
+  { id: '18', name: 'Tereza Havlíková', phone: '+420 774 444 546', country: 'CZ', region: 'STC', city: 'Mladá Boleslav', street: 'Laurinova 5', materials: ['konektory', 'desky', 'ostatní'], smsEnabled: false },
+  { id: '19', name: 'Stefan Müller', phone: '+43 664 234 5678', country: 'zahraničí', euCountry: 'AT', city: 'Wien', street: 'Stephansplatz 5', materials: ['desky', 'konektory'], smsEnabled: true },
+  { id: '20', name: 'Marek Kowalski', phone: '+48 502 345 678', country: 'zahraničí', euCountry: 'PL', city: 'Kraków', street: 'Rynek Główny 1', materials: ['mobily', 'elektronika', 'desky', 'hdd', 'cpu'], smsEnabled: true },
+  { id: '21', name: 'Peter Novák', phone: '+421 903 456 789', country: 'zahraničí', euCountry: 'SK', city: 'Bratislava', street: 'Hlavné nám. 3', materials: ['elektronika'], smsEnabled: false },
+  { id: '22', name: 'Jean Dupont', phone: '+33 6 12 34 56 78', country: 'zahraničí', euCountry: 'FR', city: 'Paris', street: 'Rue de Rivoli 10', materials: ['konektory', 'mobily'], smsEnabled: true },
+  { id: '23', name: 'Lukáš Nagy', phone: '+36 30 567 8901', country: 'zahraničí', euCountry: 'HU', city: 'Budapest', street: 'Váci utca 12', materials: ['ostatní', 'desky'], smsEnabled: false },
+  { id: '24', name: 'Hans van der Berg', phone: '+31 6 23 45 67 89', country: 'zahraničí', euCountry: 'NL', city: 'Amsterdam', street: 'Damrak 8', materials: ['desky', 'elektronika', 'kontakty'], smsEnabled: true },
+];

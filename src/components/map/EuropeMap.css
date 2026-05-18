@@ -1,0 +1,39 @@
+.europe-map-container {
+  width: 100%;
+}
+
+.europe-map-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.europe-region {
+  fill: #dde3f0;
+  stroke: #fff;
+  stroke-width: 0.6;
+  cursor: pointer;
+  transition: fill 0.15s ease;
+}
+
+.europe-region.has-contacts {
+  fill: #818cf8;
+}
+
+.europe-region.hovered {
+  fill: #a5b4fc;
+}
+
+.europe-region.has-contacts.hovered {
+  fill: #6366f1;
+}
+
+.europe-region.selected {
+  fill: #4f46e5;
+  stroke: #fff;
+  stroke-width: 1.2;
+}
+
+.europe-region.selected.hovered {
+  fill: #4338ca;
+}

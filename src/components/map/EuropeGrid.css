@@ -1,0 +1,63 @@
+.europe-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.country-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  text-align: left;
+  min-width: 0;
+}
+
+.country-card:hover:not(:disabled) {
+  border-color: var(--primary);
+  background: #f5f3ff;
+  box-shadow: var(--shadow-sm);
+}
+
+.country-card.selected {
+  border-color: var(--primary);
+  background: #ede9fe;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.country-card.empty {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.country-flag {
+  border-radius: 2px;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.1);
+}
+
+.country-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.country-card-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.country-card-count {
+  font-size: 11px;
+  color: var(--primary);
+  font-weight: 600;
+}
