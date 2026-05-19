@@ -35,35 +35,22 @@
 }
 
 .map-label {
-  font-size: 7.5px;
+  font-size: 11px;
   font-family: 'Inter', sans-serif;
-  fill: #334155;
+  fill: #1e293b;
   font-weight: 600;
   pointer-events: none;
   user-select: none;
   paint-order: stroke;
-  stroke: #fff;
-  stroke-width: 2.5px;
+  stroke: rgba(255,255,255,0.95);
+  stroke-width: 3.5px;
   stroke-linejoin: round;
 }
 
-g:has(.map-region.selected) .map-label {
+.map-label-selected {
   fill: #fff;
-  stroke: rgba(79,70,229,0.4);
-}
-
-.map-count {
-  font-size: 8px;
-  fill: #4f46e5;
-  font-weight: 800;
-  paint-order: stroke;
-  stroke: #fff;
-  stroke-width: 2px;
-}
-
-g:has(.map-region.selected) .map-count {
-  fill: #e0e7ff;
   stroke: rgba(79,70,229,0.3);
+  stroke-width: 3px;
 }
 
 .map-loading {

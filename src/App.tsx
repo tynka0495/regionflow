@@ -230,6 +230,10 @@ export default function App() {
             <span className="mobile-nav-label">{item.label}</span>
           </button>
         ))}
+        <button className="mobile-nav-item mobile-nav-logout" onClick={handleLogout}>
+          <span className="mobile-nav-icon">⏻</span>
+          <span className="mobile-nav-label">{lang === 'en' ? 'Logout' : 'Odhlásit'}</span>
+        </button>
       </nav>
     </div>
     </LanguageContext.Provider>

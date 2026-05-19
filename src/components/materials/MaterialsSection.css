@@ -175,3 +175,12 @@
     opacity: 1;
   }
 }
+
+@media (max-width: 540px) {
+  .mat-edit-modal {
+    max-width: 100%;
+    width: 100%;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    animation: modalInMobile 0.22s ease;
+  }
+}

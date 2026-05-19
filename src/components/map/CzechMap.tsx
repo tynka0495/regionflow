@@ -20,6 +20,27 @@ interface CzechMapProps {
 const W = 700;
 const H = 440;
 
+const SHORT_NAMES: Record<string, string> = {
+  PHA: 'Praha',
+  STC: 'Středočeský',
+  JHC: 'Jihočeský',
+  PLK: 'Plzeňský',
+  KVK: 'Karlovarský',
+  ULK: 'Ústecký',
+  LBK: 'Liberecký',
+  HKK: 'Kr. Hradecký',
+  PAK: 'Pardubický',
+  VYS: 'Vysočina',
+  JHM: 'Jihomoravský',
+  OLK: 'Olomoucký',
+  ZLK: 'Zlínský',
+  MSK: 'Moravskoslezský',
+};
+
+const LABEL_OFFSETS: Record<string, [number, number]> = {
+  PHA: [0, -16],
+  STC: [55, -20],
+};
 
 export function CzechMap({ selectedRegion, onRegionSelect, contactCountByRegion }: CzechMapProps) {
   const [geoData, setGeoData] = useState<FeatureCollection | null>(null);
@@ -52,10 +73,7 @@ export function CzechMap({ selectedRegion, onRegionSelect, contactCountByRegion 
 
   return (
     <div className="czech-map-container">
-      <svg
-        viewBox={`0 0 ${W} ${H}`}
-        className="czech-map-svg"
-      >
+      <svg viewBox={`0 0 ${W} ${H}`} className="czech-map-svg">
         {features.map(feature => {
           const code = feature.properties.code as RegionCode;
           const isSelected = selectedRegion === code;
@@ -73,6 +91,26 @@ export function CzechMap({ selectedRegion, onRegionSelect, contactCountByRegion 
           );
         })}
 
+        {features.map(feature => {
+          const code = feature.properties.code as RegionCode;
+          const centroid = pathGen.centroid(feature);
+          const label = SHORT_NAMES[code] ?? feature.properties.name;
+          const [ox, oy] = LABEL_OFFSETS[code] ?? [0, 0];
+          if (!centroid || isNaN(centroid[0])) return null;
+          return (
+            <text
+              key={`label-${code}`}
+              x={centroid[0] + ox}
+              y={centroid[1] + oy}
+              className={`map-label ${selectedRegion === code ? 'map-label-selected' : ''}`}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              pointerEvents="none"
+            >
+              {label}
+            </text>
+          );
+        })}
       </svg>
     </div>
   );

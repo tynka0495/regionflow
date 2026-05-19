@@ -90,6 +90,15 @@
   font-weight: 500;
 }
 
+.mobile-nav-logout {
+  color: #ef4444;
+  opacity: 0.7;
+}
+
+.mobile-nav-logout:hover {
+  opacity: 1;
+}
+
 @media (max-width: 768px) {
   .app-main {
     margin-left: 0;
