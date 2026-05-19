@@ -82,13 +82,24 @@
 
   .filter-search {
     width: 100%;
+    min-width: 0;
   }
 
   .filter-selects {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
     width: 100%;
   }
 
   .filter-select {
-    flex: 1;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .filter-clear {
+    grid-column: 1 / -1;
   }
 }
