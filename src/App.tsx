@@ -2,7 +2,6 @@ import { useState, useEffect, useLayoutEffect } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase, rowToContact, rowToMaterial, contactToRow, rowToSettings, settingsToRow } from './lib/supabase';
 import { LanguageContext } from './lib/LanguageContext';
-import { t } from './lib/i18n';
 import { Sidebar } from './components/layout/Sidebar';
 import { ContactsSection } from './components/contacts/ContactsSection';
 import { MaterialsSection } from './components/materials/MaterialsSection';
@@ -176,9 +175,9 @@ export default function App() {
   const lang = userSettings.language ?? 'cs';
 
   const NAV_ITEMS: { id: ActiveSection; label: string; icon: string }[] = [
-    { id: 'contacts', label: t('nav_contacts', lang), icon: '👥' },
-    { id: 'materials', label: t('nav_materials', lang), icon: '♻️' },
-    { id: 'settings', label: t('nav_settings', lang), icon: '⚙️' },
+    { id: 'contacts', label: 'Kontakty', icon: '👥' },
+    { id: 'materials', label: 'Materiály', icon: '♻️' },
+    { id: 'settings', label: 'Nastavení', icon: '⚙️' },
   ];
 
   return (
@@ -232,7 +231,7 @@ export default function App() {
         ))}
         <button className="mobile-nav-item mobile-nav-logout" onClick={handleLogout}>
           <span className="mobile-nav-icon">⏻</span>
-          <span className="mobile-nav-label">{lang === 'en' ? 'Logout' : 'Odhlásit'}</span>
+          <span className="mobile-nav-label">Odhlásit</span>
         </button>
       </nav>
     </div>
