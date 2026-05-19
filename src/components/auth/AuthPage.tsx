@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import { useLanguage } from '../../lib/LanguageContext';
+import { t } from '../../lib/i18n';
 import './AuthPage.css';
 
 type AuthMode = 'login' | 'register' | 'forgot';
@@ -7,6 +9,7 @@ type AuthMode = 'login' | 'register' | 'forgot';
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function AuthPage() {
+  const lang = useLanguage();
   const [mode, setMode] = useState<AuthMode>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -22,15 +25,15 @@ export function AuthPage() {
   const validate = (): boolean => {
     const e: Record<string, string> = {};
     if (!email.trim()) {
-      e.email = 'Email je povinný';
+      e.email = t('auth_err_email_required', lang);
     } else if (!EMAIL_RE.test(email)) {
-      e.email = 'Zadejte platný email';
+      e.email = t('auth_err_email_invalid', lang);
     }
     if (mode !== 'forgot') {
       if (!password) {
-        e.password = 'Heslo je povinné';
+        e.password = t('auth_err_password_required', lang);
       } else if (password.length < 6) {
-        e.password = 'Heslo musí mít alespoň 6 znaků';
+        e.password = t('auth_err_password_short', lang);
       }
     }
     setErrors(e);
@@ -45,17 +48,17 @@ export function AuthPage() {
 
     if (mode === 'login') {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) setErrors({ email: ' ', password: 'Nesprávný email nebo heslo' });
+      if (error) setErrors({ email: ' ', password: t('auth_err_wrong', lang) });
     } else if (mode === 'register') {
       const { error } = await supabase.auth.signUp({ email, password });
-      if (error) setErrors({ email: 'Registrace se nezdařila: ' + error.message });
-      else setSuccess('Účet vytvořen! Zkontroluj email pro potvrzení.');
+      if (error) setErrors({ email: t('auth_err_register', lang) + error.message });
+      else setSuccess(t('auth_success_register', lang));
     } else {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}`,
       });
-      if (error) setErrors({ email: 'Nepodařilo se odeslat email: ' + error.message });
-      else setSuccess('Email s odkazem pro obnovu hesla byl odeslán.');
+      if (error) setErrors({ email: t('auth_err_forgot', lang) + error.message });
+      else setSuccess(t('auth_success_forgot', lang));
     }
 
     setLoading(false);
@@ -70,7 +73,7 @@ export function AuthPage() {
           <span className="auth-logo-icon">♻</span>
           <div>
             <div className="auth-logo-name">RegionFlow</div>
-            <div className="auth-logo-sub">Správa výkupů</div>
+            <div className="auth-logo-sub">{t('auth_logo_sub', lang)}</div>
           </div>
         </div>
 
@@ -79,30 +82,30 @@ export function AuthPage() {
             <button
               className={`auth-tab ${mode === 'login' ? 'active' : ''}`}
               onClick={() => goToMode('login')}
-            >Přihlášení</button>
+            >{t('auth_tab_login', lang)}</button>
             <button
               className={`auth-tab ${mode === 'register' ? 'active' : ''}`}
               onClick={() => goToMode('register')}
-            >Registrace</button>
+            >{t('auth_tab_register', lang)}</button>
           </div>
         )}
 
         {mode === 'forgot' && (
           <div className="auth-forgot-header">
-            <button className="auth-back" onClick={() => goToMode('login')}>← Zpět</button>
-            <h2 className="auth-forgot-title">Zapomenuté heslo</h2>
-            <p className="auth-forgot-hint">Zašleme Vám odkaz pro obnovu hesla.</p>
+            <button className="auth-back" onClick={() => goToMode('login')}>{t('auth_back', lang)}</button>
+            <h2 className="auth-forgot-title">{t('auth_forgot_title', lang)}</h2>
+            <p className="auth-forgot-hint">{t('auth_forgot_hint', lang)}</p>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="auth-form" noValidate>
           <div className="form-field">
-            <label>Email</label>
+            <label>{t('auth_email', lang)}</label>
             <input
               type="email"
               value={email}
               onChange={e => { setEmail(e.target.value); clearError('email'); }}
-              placeholder="vas@email.cz"
+              placeholder={t('auth_email_ph', lang)}
               className={errors.email && errors.email.trim() ? 'error' : ''}
               autoFocus
             />
@@ -113,7 +116,7 @@ export function AuthPage() {
 
           {mode !== 'forgot' && (
             <div className="form-field">
-              <label>Heslo</label>
+              <label>{t('auth_password', lang)}</label>
               <input
                 type="password"
                 value={password}
@@ -131,17 +134,17 @@ export function AuthPage() {
 
           <button type="submit" className="btn-primary auth-submit" disabled={loading}>
             {loading
-              ? 'Chvíli strpení...'
+              ? t('auth_loading', lang)
               : mode === 'login'
-                ? 'Přihlásit se'
+                ? t('auth_submit_login', lang)
                 : mode === 'register'
-                  ? 'Vytvořit účet'
-                  : 'Odeslat odkaz'}
+                  ? t('auth_submit_register', lang)
+                  : t('auth_submit_forgot', lang)}
           </button>
 
           {mode === 'login' && !success && (
             <button type="button" className="auth-forgot-link" onClick={() => goToMode('forgot')}>
-              Zapomenuté heslo?
+              {t('auth_forgot_link', lang)}
             </button>
           )}
         </form>

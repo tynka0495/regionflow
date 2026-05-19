@@ -1,4 +1,6 @@
 import type { ActiveSection } from '../../types';
+import { useLanguage } from '../../lib/LanguageContext';
+import { t } from '../../lib/i18n';
 import './Sidebar.css';
 
 interface SidebarProps {
@@ -9,10 +11,11 @@ interface SidebarProps {
 }
 
 export function Sidebar({ activeSection, onSectionChange, userEmail, onLogout }: SidebarProps) {
+  const lang = useLanguage();
   const NAV_ITEMS: { id: ActiveSection; label: string; icon: string }[] = [
-    { id: 'contacts', label: 'Kontakty', icon: '👥' },
-    { id: 'materials', label: 'Materiály', icon: '♻️' },
-    { id: 'settings', label: 'Nastavení', icon: '⚙️' },
+    { id: 'contacts', label: t('nav_contacts', lang), icon: '👥' },
+    { id: 'materials', label: t('nav_materials', lang), icon: '♻️' },
+    { id: 'settings', label: t('nav_settings', lang), icon: '⚙️' },
   ];
   const initials = userEmail ? userEmail.charAt(0).toUpperCase() : '?';
 

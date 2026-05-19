@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'; // useRef/useEffect used in MaterialModal
 import { Layout } from '../layout/Layout';
 import type { Contact, Material } from '../../types';
+import { useLanguage } from '../../lib/LanguageContext';
 import { t } from '../../lib/i18n';
 import './MaterialsSection.css';
 
@@ -149,7 +150,7 @@ function MaterialModal({ material, onSave, onDelete, onClose }: MaterialModalPro
 
 
 export function MaterialsSection({ contacts, allMaterials, onAddMaterial, onUpdateMaterial, onDeleteMaterial }: MaterialsSectionProps) {
-  const lang = 'cs' as const;
+  const lang = useLanguage();
   const [editingMaterial, setEditingMaterial] = useState<Material | null>(null);
   const [addModalOpen, setAddModalOpen] = useState(false);
 

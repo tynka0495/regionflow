@@ -10,6 +10,7 @@ import { MapToggle } from '../map/MapToggle';
 import type { MapMode } from '../map/MapToggle';
 import type { Contact, RegionCode, Country, Material } from '../../types';
 import { REGIONS } from '../../types';
+import { useLanguage } from '../../lib/LanguageContext';
 import { t } from '../../lib/i18n';
 import './ContactsSection.css';
 
@@ -23,7 +24,7 @@ interface ContactsSectionProps {
 }
 
 export function ContactsSection({ contacts, onSaveContact, onDeleteContact, allMaterials, onAddMaterial, smsTemplate }: ContactsSectionProps) {
-  const lang = 'cs' as const;
+  const lang = useLanguage();
   const [mapMode, setMapMode] = useState<MapMode>('CZ');
   const [search, setSearch] = useState('');
   const [filterRegion, setFilterRegion] = useState<RegionCode | ''>('');
@@ -121,7 +122,7 @@ export function ContactsSection({ contacts, onSaveContact, onDeleteContact, allM
     <>
       <Layout
         title={t('contacts_title', lang)}
-        subtitle={`${filtered.length} kontaktů · ${smsCount} SMS aktivní`}
+        subtitle={`${filtered.length} ${t('contacts_subtitle', lang)} · ${smsCount} ${t('contacts_sms_active', lang)}`}
         actions={<button className="btn-primary" onClick={openCreate}>{t('contacts_add', lang)}</button>}
       >
         <ContactsFilter
