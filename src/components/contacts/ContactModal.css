@@ -167,11 +167,6 @@
   border-color: #ef4444;
 }
 
-.field-error {
-  font-size: 11px;
-  color: #ef4444;
-  font-weight: 500;
-}
 
 .materials-grid {
   display: flex;

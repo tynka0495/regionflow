@@ -182,3 +182,7 @@
 .auth-form .form-field input:focus {
   border-color: var(--primary);
 }
+
+.auth-form .form-field input.error {
+  border-color: #ef4444;
+}

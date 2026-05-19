@@ -96,3 +96,9 @@ input, select, textarea {
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border);
 }
+
+.field-error {
+  font-size: 11px;
+  color: #ef4444;
+  font-weight: 500;
+}
