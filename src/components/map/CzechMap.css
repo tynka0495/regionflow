@@ -88,3 +88,9 @@ g:has(.map-region.selected) .map-count {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+@media (max-width: 768px) {
+  .czech-map-svg {
+    max-height: 240px;
+  }
+}

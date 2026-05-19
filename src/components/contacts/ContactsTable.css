@@ -273,17 +273,15 @@
 }
 
 @media (max-width: 768px) {
-  .contacts-table-wrap {
-    overflow-x: auto;
-  }
-
-  .contacts-table th:nth-child(2),
-  .contacts-table td:nth-child(2),
   .contacts-table th:nth-child(3),
   .contacts-table td:nth-child(3),
   .contacts-table th:nth-child(4),
   .contacts-table td:nth-child(4) {
     display: none;
+  }
+
+  .contact-phone {
+    font-size: 12px;
   }
 
   .contact-actions {
@@ -294,6 +292,11 @@
 @media (max-width: 480px) {
   .contacts-table th,
   .contacts-table td {
-    padding: 8px 10px;
+    padding: 8px 8px;
+  }
+
+  .contacts-table th:nth-child(2),
+  .contacts-table td:nth-child(2) {
+    display: none;
   }
 }

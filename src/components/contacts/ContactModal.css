@@ -324,8 +324,21 @@
     grid-template-columns: 1fr;
   }
 
-  .modal {
-    max-height: 100vh;
-    border-radius: var(--radius-md);
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
   }
+
+  .modal {
+    max-height: 92dvh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    width: 100%;
+    max-width: 100%;
+    animation: modalInMobile 0.22s ease;
+  }
+}
+
+@keyframes modalInMobile {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
 }

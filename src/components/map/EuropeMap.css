@@ -37,3 +37,9 @@
 .europe-region.selected.hovered {
   fill: #4338ca;
 }
+
+@media (max-width: 768px) {
+  .europe-map-svg {
+    max-height: 240px;
+  }
+}
