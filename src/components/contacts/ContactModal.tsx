@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import type { Contact, RegionCode, Country } from '../../types';
 import { REGIONS } from '../../types';
+import { useLanguage } from '../../lib/LanguageContext';
+import { t } from '../../lib/i18n';
 import './ContactModal.css';
 
 interface ContactModalProps {
@@ -25,6 +27,7 @@ const EMPTY_FORM = {
 };
 
 export function ContactModal({ contact, allMaterials, onAddMaterial, onSave, onDelete, onClose }: ContactModalProps) {
+  const lang = useLanguage();
   const isEdit = !!contact;
   const [form, setForm] = useState({ ...EMPTY_FORM });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -85,12 +88,12 @@ export function ContactModal({ contact, allMaterials, onAddMaterial, onSave, onD
 
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!form.name.trim()) e.name = 'Jméno je povinné';
-    if (!form.phone.trim()) e.phone = 'Telefon je povinný';
-    if (!form.city.trim()) e.city = 'Město je povinné';
-    if (form.country === 'CZ' && !form.region) e.region = 'Vyberte kraj';
-    if (form.country === 'zahraničí' && !form.euCountry) e.euCountry = 'Vyberte zemi';
-    if (form.materials.length === 0) e.materials = 'Vyberte alespoň jeden materiál';
+    if (!form.name.trim()) e.name = t('err_name', lang);
+    if (!form.phone.trim()) e.phone = t('err_phone', lang);
+    if (!form.city.trim()) e.city = t('err_city', lang);
+    if (form.country === 'CZ' && !form.region) e.region = t('err_region', lang);
+    if (form.country === 'zahraničí' && !form.euCountry) e.euCountry = t('err_eu_country', lang);
+    if (form.materials.length === 0) e.materials = t('err_materials', lang);
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -116,7 +119,7 @@ export function ContactModal({ contact, allMaterials, onAddMaterial, onSave, onD
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal">
         <div className="modal-header">
-          <h2>{isEdit ? 'Upravit kontakt' : 'Nový kontakt'}</h2>
+          <h2>{isEdit ? t('modal_edit_contact', lang) : t('modal_new_contact', lang)}</h2>
           <button className="modal-close" onClick={onClose}>✕</button>
         </div>
 
@@ -124,7 +127,7 @@ export function ContactModal({ contact, allMaterials, onAddMaterial, onSave, onD
           <div className="modal-body">
             <div className="form-row">
               <div className="form-field">
-                <label>Jméno *</label>
+                <label>{t('field_name', lang)}</label>
                 <input
                   type="text"
                   value={form.name}
@@ -135,7 +138,7 @@ export function ContactModal({ contact, allMaterials, onAddMaterial, onSave, onD
                 {errors.name && <span className="field-error">{errors.name}</span>}
               </div>
               <div className="form-field">
-                <label>Telefon *</label>
+                <label>{t('field_phone', lang)}</label>
                 <input
                   type="text"
                   value={form.phone}
@@ -149,7 +152,7 @@ export function ContactModal({ contact, allMaterials, onAddMaterial, onSave, onD
 
             <div className="form-row">
               <div className="form-field">
-                <label>Země *</label>
+                <label>{t('field_country', lang)}</label>
                 <select
                   value={form.country}
                   onChange={e => {
@@ -158,20 +161,20 @@ export function ContactModal({ contact, allMaterials, onAddMaterial, onSave, onD
                     set('euCountry', '');
                   }}
                 >
-                  <option value="CZ">Česká republika</option>
-                  <option value="zahraničí">Zahraničí</option>
+                  <option value="CZ">{t('filter_cz', lang)}</option>
+                  <option value="zahraničí">{t('filter_foreign', lang)}</option>
                 </select>
               </div>
 
               {form.country === 'CZ' ? (
                 <div className="form-field">
-                  <label>Kraj *</label>
+                  <label>{t('field_region', lang)}</label>
                   <select
                     value={form.region}
                     onChange={e => set('region', e.target.value as RegionCode)}
                     className={errors.region ? 'error' : ''}
                   >
-                    <option value="">— vyberte kraj —</option>
+                    <option value="">{t('field_region_ph', lang)}</option>
                     {REGIONS.map(r => (
                       <option key={r.code} value={r.code}>{r.name}</option>
                     ))}
@@ -180,7 +183,7 @@ export function ContactModal({ contact, allMaterials, onAddMaterial, onSave, onD
                 </div>
               ) : (
                 <div className="form-field">
-                  <label>Stát *</label>
+                  <label>{t('field_state', lang)}</label>
                   <input
                     type="text"
                     value={form.euCountry}
@@ -196,7 +199,7 @@ export function ContactModal({ contact, allMaterials, onAddMaterial, onSave, onD
 
             <div className="form-row">
               <div className="form-field">
-                <label>Město *</label>
+                <label>{t('field_city', lang)}</label>
                 <input
                   type="text"
                   value={form.city}
@@ -207,7 +210,7 @@ export function ContactModal({ contact, allMaterials, onAddMaterial, onSave, onD
                 {errors.city && <span className="field-error">{errors.city}</span>}
               </div>
               <div className="form-field">
-                <label>Ulice</label>
+                <label>{t('field_street', lang)}</label>
                 <input
                   type="text"
                   value={form.street}
@@ -219,7 +222,7 @@ export function ContactModal({ contact, allMaterials, onAddMaterial, onSave, onD
 
             <div className="form-field">
               <label>
-                Materiály *
+                {t('field_materials', lang)}
                 {errors.materials && <span className="field-error">{errors.materials}</span>}
               </label>
               <div className="materials-grid">
@@ -241,7 +244,7 @@ export function ContactModal({ contact, allMaterials, onAddMaterial, onSave, onD
                       type="text"
                       value={newMaterial}
                       onChange={e => setNewMaterial(e.target.value)}
-                      placeholder="název materiálu"
+                      placeholder={t('mat_new_ph', lang)}
                       onKeyDown={e => {
                         if (e.key === 'Enter') { e.preventDefault(); handleAddNewMaterial(); }
                         if (e.key === 'Escape') { setShowNewInput(false); setNewMaterial(''); }
@@ -252,7 +255,7 @@ export function ContactModal({ contact, allMaterials, onAddMaterial, onSave, onD
                   </div>
                 ) : (
                   <button type="button" className="add-material-btn" onClick={() => setShowNewInput(true)}>
-                    + nový
+                    {t('mat_add_new', lang)}
                   </button>
                 )}
               </div>
@@ -265,7 +268,7 @@ export function ContactModal({ contact, allMaterials, onAddMaterial, onSave, onD
                 onChange={e => set('smsEnabled', e.target.checked)}
               />
               <span className="sms-toggle-track" />
-              <span className="sms-toggle-label">Kontakt chce dostávat SMS upozornění na výkupy</span>
+              <span className="sms-toggle-label">{t('field_sms_toggle', lang)}</span>
             </label>
           </div>
 
@@ -273,20 +276,20 @@ export function ContactModal({ contact, allMaterials, onAddMaterial, onSave, onD
             {isEdit && onDelete && (
               confirmDelete ? (
                 <div className="footer-confirm">
-                  <span className="footer-confirm-text">Opravdu smazat?</span>
-                  <button type="button" className="btn-secondary" onClick={() => setConfirmDelete(false)}>Ne</button>
-                  <button type="button" className="btn-danger" onClick={() => { onDelete(); onClose(); }}>Smazat</button>
+                  <span className="footer-confirm-text">{t('btn_delete_confirm', lang)}</span>
+                  <button type="button" className="btn-secondary" onClick={() => setConfirmDelete(false)}>{t('btn_no', lang)}</button>
+                  <button type="button" className="btn-danger" onClick={() => { onDelete(); onClose(); }}>{t('btn_delete', lang)}</button>
                 </div>
               ) : (
                 <button type="button" className="btn-delete-inline" onClick={() => setConfirmDelete(true)}>
-                  🗑 Smazat kontakt
+                  {t('btn_delete_contact', lang)}
                 </button>
               )
             )}
             <div className="footer-actions">
-              <button type="button" className="btn-secondary" onClick={onClose}>Zrušit</button>
+              <button type="button" className="btn-secondary" onClick={onClose}>{t('btn_cancel', lang)}</button>
               <button type="submit" className="btn-primary">
-                {isEdit ? 'Uložit změny' : 'Přidat kontakt'}
+                {isEdit ? t('btn_save', lang) : t('btn_add_contact', lang)}
               </button>
             </div>
           </div>

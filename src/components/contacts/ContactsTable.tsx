@@ -1,5 +1,7 @@
 import type { Contact } from '../../types';
 import { REGIONS } from '../../types';
+import { useLanguage } from '../../lib/LanguageContext';
+import { t } from '../../lib/i18n';
 import './ContactsTable.css';
 
 interface ContactsTableProps {
@@ -21,6 +23,8 @@ const MATERIAL_COLORS: Record<string, string> = {
 };
 
 export function ContactsTable({ contacts, onEdit }: ContactsTableProps) {
+  const lang = useLanguage();
+
   const getRegionName = (code?: string) =>
     REGIONS.find(r => r.code === code)?.name ?? '—';
 
@@ -28,7 +32,7 @@ export function ContactsTable({ contacts, onEdit }: ContactsTableProps) {
     return (
       <div className="card contacts-empty">
         <div className="contacts-empty-icon">🔍</div>
-        <p>Žádné kontakty neodpovídají filtru</p>
+        <p>{t('contacts_empty_msg', lang)}</p>
       </div>
     );
   }
@@ -39,14 +43,14 @@ export function ContactsTable({ contacts, onEdit }: ContactsTableProps) {
         <table className="contacts-table">
           <thead>
             <tr>
-              <th>Jméno</th>
-              <th>Telefon</th>
-              <th>Kraj / Město</th>
-              <th>Materiál</th>
+              <th>{t('col_name', lang)}</th>
+              <th>{t('col_phone', lang)}</th>
+              <th>{t('col_region', lang)}</th>
+              <th>{t('col_material', lang)}</th>
               <th>
                 <span className="th-sms">
                   SMS
-                  <span className="th-tooltip" data-tooltip="Kontakt souhlasí s přijímáním SMS upozornění o výkupech. Hromadná SMS se odešle jen těmto kontaktům.">?</span>
+                  <span className="th-tooltip" data-tooltip={t('sms_tooltip', lang)}>?</span>
                 </span>
               </th>
             </tr>
@@ -66,7 +70,7 @@ export function ContactsTable({ contacts, onEdit }: ContactsTableProps) {
                 <td className="contact-region">
                   {contact.country === 'CZ'
                     ? getRegionName(contact.region)
-                    : <span className="badge-foreign">Zahraničí</span>
+                    : <span className="badge-foreign">{t('badge_foreign', lang)}</span>
                   }
                 </td>
                 <td>

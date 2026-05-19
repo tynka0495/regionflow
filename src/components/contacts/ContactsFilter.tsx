@@ -1,5 +1,7 @@
 import type { RegionCode, Country, Material } from '../../types';
 import { REGIONS } from '../../types';
+import { useLanguage } from '../../lib/LanguageContext';
+import { t } from '../../lib/i18n';
 import './ContactsFilter.css';
 
 interface ContactsFilterProps {
@@ -21,6 +23,7 @@ export function ContactsFilter({
   filterMaterial, onMaterialChange,
   allMaterials,
 }: ContactsFilterProps) {
+  const lang = useLanguage();
   const hasFilters = search || filterRegion || filterCountry || filterMaterial;
 
   const clearAll = () => {
@@ -36,7 +39,7 @@ export function ContactsFilter({
         <span className="filter-search-icon">🔍</span>
         <input
           type="text"
-          placeholder="Hledat podle jména, telefonu nebo města..."
+          placeholder={t('filter_search_ph', lang)}
           value={search}
           onChange={e => onSearchChange(e.target.value)}
           className="filter-input"
@@ -49,9 +52,9 @@ export function ContactsFilter({
           onChange={e => onCountryChange(e.target.value as Country | '')}
           className="filter-select"
         >
-          <option value="">Všechny země</option>
-          <option value="CZ">Česká republika</option>
-          <option value="zahraničí">Zahraničí</option>
+          <option value="">{t('filter_all_countries', lang)}</option>
+          <option value="CZ">{t('filter_cz', lang)}</option>
+          <option value="zahraničí">{t('filter_foreign', lang)}</option>
         </select>
 
         <select
@@ -59,7 +62,7 @@ export function ContactsFilter({
           onChange={e => onRegionChange(e.target.value as RegionCode | '')}
           className="filter-select"
         >
-          <option value="">Všechny kraje</option>
+          <option value="">{t('filter_all_regions', lang)}</option>
           {REGIONS.map(r => (
             <option key={r.code} value={r.code}>{r.name}</option>
           ))}
@@ -70,15 +73,15 @@ export function ContactsFilter({
           onChange={e => onMaterialChange(e.target.value)}
           className="filter-select"
         >
-          <option value="">Všechny materiály</option>
+          <option value="">{t('filter_all_materials', lang)}</option>
           {allMaterials.map(m => (
-            <option key={m.name} value={m.name}>{m.name.charAt(0).toUpperCase() + m.name.slice(1)}</option>
+            <option key={m.name} value={m.name}>{m.name}</option>
           ))}
         </select>
 
         {hasFilters && (
           <button className="filter-clear" onClick={clearAll}>
-            ✕ Zrušit filtry
+            {t('filter_clear', lang)}
           </button>
         )}
       </div>
