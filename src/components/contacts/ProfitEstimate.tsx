@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { Contact, Material } from '../../types';
-import { REGIONS } from '../../types';
+import { QTY_BY_MATERIAL, REGIONS } from '../../types';
 import './ProfitEstimate.css';
 
 interface ProfitEstimateProps {
@@ -9,11 +9,6 @@ interface ProfitEstimateProps {
   scopeName?: string | null;
 }
 
-// Assumed quantity a supplier brings per pickup; materials not listed fall back to their price unit.
-const QTY_BY_MATERIAL: Record<string, number> = {
-  'železo': 300, 'měď': 8, 'hliník': 20, mosaz: 5, nerez: 15, olovo: 10,
-  kabely: 15, 'elektro šrot': 40, autobaterie: 30, 'papír': 150, plasty: 50,
-};
 const QTY_BY_UNIT: Record<NonNullable<Material['unit']>, number> = { kg: 25, ks: 4, t: 0.05 };
 const qtyFor = (m: Material) => QTY_BY_MATERIAL[m.name] ?? QTY_BY_UNIT[m.unit ?? 'kg'];
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Contact, Country, RegionCode } from '../../types';
+import type { Contact, Country, Material, RegionCode } from '../../types';
 import { regionsOf, EU_COUNTRIES } from '../../types';
 import { buildContactsTemplate, readSheet } from '../../lib/contactsSheet';
 import '../sms/SmsModal.css';
@@ -7,7 +7,7 @@ import './CsvImportModal.css';
 
 interface CsvImportModalProps {
   existingContacts: Contact[];
-  allMaterials: string[];
+  allMaterials: Material[];
   onAddMaterial: (material: string) => void;
   onImport: (contacts: Contact[]) => void;
   onClose: () => void;
@@ -192,7 +192,7 @@ export function CsvImportModal({ existingContacts, allMaterials, onAddMaterial, 
       setHeaderError('Soubor se nepodařilo přečíst. Použijte Excel (.xlsx) nebo CSV.');
       return;
     }
-    const result = validateRows(table, existingContacts, allMaterials);
+    const result = validateRows(table, existingContacts, allMaterials.map(m => m.name));
     setRows(result.rows);
     setHeaderError(result.headerError);
   };

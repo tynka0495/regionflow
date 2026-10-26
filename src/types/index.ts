@@ -119,6 +119,12 @@ export const REGIONS: Region[] = [
 
 export const regionsOf = (country: Country) => REGIONS.filter(r => r.country === country);
 
+// Assumed quantity a supplier brings per pickup; materials not listed fall back to their price unit.
+export const QTY_BY_MATERIAL: Record<string, number> = {
+  'železo': 300, 'měď': 8, 'hliník': 20, mosaz: 5, nerez: 15, olovo: 10,
+  kabely: 15, 'elektro šrot': 40, autobaterie: 30, 'papír': 150, plasty: 50,
+};
+
 export const MATERIALS: Material[] = [
   { name: 'železo', price: 4, unit: 'kg', active: true },
   { name: 'měď', price: 180, unit: 'kg', active: true },

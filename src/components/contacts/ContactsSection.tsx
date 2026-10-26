@@ -204,7 +204,7 @@ export function ContactsSection({ contacts, onSaveContact, onDeleteContact, onIm
       {importOpen && (
         <CsvImportModal
           existingContacts={contacts}
-          allMaterials={allMaterials.map(m => m.name)}
+          allMaterials={allMaterials}
           onAddMaterial={onAddMaterial}
           onImport={onImportContacts}
           onClose={() => setImportOpen(false)}
