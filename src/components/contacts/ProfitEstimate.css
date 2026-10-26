@@ -24,30 +24,6 @@
   margin-top: 2px;
 }
 
-.profit-inputs {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.profit-inputs label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-.profit-inputs input {
-  width: 56px;
-  padding: 4px 6px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--card);
-  color: var(--text-primary);
-  font-size: 13px;
-}
-
 .profit-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
