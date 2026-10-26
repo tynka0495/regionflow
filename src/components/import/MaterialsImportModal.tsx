@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Material } from '../../types';
-import { buildContactsTemplate, readSheet } from '../../lib/contactsSheet';
+import { buildMaterialsTemplate, MATERIALS_SHEET, readSheet } from '../../lib/contactsSheet';
 import { normalize, parseBool, parseCsv, parseNumber } from '../../lib/sheetUtils';
 import '../sms/SmsModal.css';
 import './CsvImportModal.css';
@@ -40,7 +40,7 @@ const formatPrice = (m?: Material) => (m?.price !== undefined ? `${m.price} Kč/
 function validateMaterials(table: string[][], existing: Material[]): { rows: ParsedMaterial[]; headerError?: string } {
   if (table.length < 2) return { rows: [], headerError: 'Soubor neobsahuje žádné řádky s materiály.' };
   const header = table[0].map(h => ALIASES[normalize(h)]);
-  if (!header.includes('name')) return { rows: [], headerError: 'V hlavičce chybí sloupec „Materiál“. Použijte list „Ceník“ ze šablony.' };
+  if (!header.includes('name')) return { rows: [], headerError: 'V hlavičce chybí sloupec „Materiál“. Stáhněte si šablonu materiálů.' };
 
   const seen = new Set<string>();
   const rows = table.slice(1).map((cells, i): ParsedMaterial => {
@@ -104,11 +104,11 @@ export function MaterialsImportModal({ allMaterials, onAddMaterial, onUpdateMate
   const actionable = toAdd.length + (allowUpdate ? toUpdate.length : 0);
 
   const downloadTemplate = async () => {
-    const buffer = await buildContactsTemplate(allMaterials);
+    const buffer = await buildMaterialsTemplate(allMaterials);
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'kontakty-sablona.xlsx';
+    a.download = 'materialy-sablona.xlsx';
     a.click();
     URL.revokeObjectURL(a.href);
   };
@@ -117,7 +117,7 @@ export function MaterialsImportModal({ allMaterials, onAddMaterial, onUpdateMate
     setFileName(file.name);
     let table: string[][];
     try {
-      table = /\.xlsx$/i.test(file.name) ? await readSheet(await file.arrayBuffer(), 'Ceník') : parseCsv(await file.text());
+      table = /\.xlsx$/i.test(file.name) ? await readSheet(await file.arrayBuffer(), [MATERIALS_SHEET, 'Ceník']) : parseCsv(await file.text());
     } catch {
       setRows([]);
       setHeaderError('Soubor se nepodařilo přečíst. Použijte Excel (.xlsx) nebo CSV.');
@@ -140,7 +140,7 @@ export function MaterialsImportModal({ allMaterials, onAddMaterial, onUpdateMate
         <div className="modal-header">
           <div>
             <h2>Import materiálů z Excelu</h2>
-            <p className="modal-subtitle">List „Ceník“ ze šablony – nové materiály i změny cen</p>
+            <p className="modal-subtitle">Nové materiály i změny cen z vlastní šablony materiálů</p>
           </div>
           <button className="modal-close" onClick={onClose}>✕</button>
         </div>
@@ -157,11 +157,11 @@ export function MaterialsImportModal({ allMaterials, onAddMaterial, onUpdateMate
             <div className="modal-body">
               <div className="csv-help">
                 <ol>
-                  <li>Stáhněte si šablonu a otevřete list <b>Ceník</b> – už v něm jsou vaše současné materiály a ceny.</li>
+                  <li>Stáhněte si šablonu materiálů – už v ní jsou vaše současné materiály a ceny.</li>
                   <li>Upravte ceny, jednotky nebo „Vykupuje se“, případně přidejte nové řádky.</li>
                   <li>Nahrajte soubor sem. Prázdná buňka znamená „neměnit“.</li>
                 </ol>
-                <button type="button" className="btn-secondary" onClick={downloadTemplate}>⬇ Stáhnout šablonu (Excel)</button>
+                <button type="button" className="btn-secondary" onClick={downloadTemplate}>⬇ Stáhnout šablonu materiálů</button>
               </div>
 
               <label className="csv-drop">
