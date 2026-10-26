@@ -43,3 +43,8 @@
     max-height: 240px;
   }
 }
+
+.europe-region.own-tab {
+  opacity: 0.35;
+  pointer-events: none;
+}

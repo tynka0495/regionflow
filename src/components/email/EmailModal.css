@@ -1,0 +1,69 @@
+.email-modal {
+  max-width: 560px;
+}
+
+.email-campaigns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.email-campaign {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--text-primary);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.email-campaign:hover {
+  background: var(--bg);
+}
+
+.email-campaign.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.email-subject {
+  width: 100%;
+}
+
+.email-hint {
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-left: 6px;
+}
+
+.email-preview {
+  margin-top: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  background: var(--bg);
+  font-size: 13px;
+}
+
+.email-preview summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.email-preview-subject {
+  margin-top: 10px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.email-preview-body {
+  margin-top: 6px;
+  white-space: pre-wrap;
+  font-family: inherit;
+  color: var(--text-primary);
+}

@@ -11,6 +11,7 @@ import { SettingsSection } from './components/settings/SettingsSection';
 import { AuthPage } from './components/auth/AuthPage';
 import type { ActiveSection, Contact, Material, UserSettings } from './types';
 import { MATERIALS } from './types';
+import { mockContacts } from './data/mockData';
 import './styles/globals.css';
 import './App.css';
 
@@ -34,6 +35,9 @@ function applyTheme(settings: UserSettings) {
   if (settings.accentColor) localStorage.setItem('accentColor', settings.accentColor);
 }
 
+// Local demo mode (npm run dev:demo): no login, mock data, nothing is written to Supabase.
+const DEMO = import.meta.env.VITE_DEMO === 'true';
+const DEMO_SESSION = { user: { id: 'demo', email: 'demo@local' } } as Session;
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -77,6 +81,13 @@ export default function App() {
   };
 
   useEffect(() => {
+    if (DEMO) {
+      setSession(DEMO_SESSION);
+      setContacts(mockContacts);
+      setAllMaterials(MATERIALS);
+      setAppLoading(false);
+      return;
+    }
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setAppLoading(false);
@@ -97,7 +108,7 @@ export default function App() {
     localStorage.setItem('activeSection', section);
   };
 
-  const handleLogout = () => supabase.auth.signOut();
+  const handleLogout = () => (DEMO ? setSession(null) : supabase.auth.signOut());
 
   const handleUpdateSettings = async (updates: Partial<UserSettings>) => {
     if (!session) return;
@@ -105,6 +116,7 @@ export default function App() {
     setUserSettings(updated);
     applyTheme(updated);
     if (updates.language) localStorage.setItem('language', updates.language);
+    if (DEMO) return;
     await supabase.from('user_settings').upsert(settingsToRow(updated, session.user.id));
   };
 
@@ -113,6 +125,10 @@ export default function App() {
       ? { name: nameOrMaterial, active: true }
       : nameOrMaterial;
     if (!session || allMaterials.find(m => m.name === mat.name)) return;
+    if (DEMO) {
+      setAllMaterials(prev => [...prev, mat]);
+      return;
+    }
     const row = { ...mat, user_id: session.user.id, sort_order: allMaterials.length };
     const { data } = await supabase.from('materials').insert(row).select().single();
     if (data) setAllMaterials(prev => [...prev, rowToMaterial(data)]);
@@ -126,6 +142,9 @@ export default function App() {
         ...c,
         materials: c.materials.map(m => m === oldName ? updated.name : m),
       })));
+    }
+    if (DEMO) return;
+    if (oldName !== updated.name) {
       await supabase.rpc('rename_material_in_contacts', {
         p_user_id: session.user.id,
         p_old_name: oldName,
@@ -142,6 +161,7 @@ export default function App() {
     if (!session) return;
     setAllMaterials(prev => prev.filter(m => m.name !== name));
     setContacts(prev => prev.map(c => ({ ...c, materials: c.materials.filter(m => m !== name) })));
+    if (DEMO) return;
     await supabase.from('materials').delete().eq('user_id', session.user.id).eq('name', name);
     await supabase.rpc('remove_material_from_contacts', {
       p_user_id: session.user.id,
@@ -151,17 +171,23 @@ export default function App() {
 
   const handleSaveContact = async (contact: Contact) => {
     if (!session) return;
-    const row = contactToRow(contact, session.user.id);
-    await supabase.from('contacts').upsert(row);
+    if (!DEMO) await supabase.from('contacts').upsert(contactToRow(contact, session.user.id));
     setContacts(prev => {
       const exists = prev.find(c => c.id === contact.id);
       return exists ? prev.map(c => c.id === contact.id ? contact : c) : [...prev, contact];
     });
   };
 
+  const handleImportContacts = async (imported: Contact[]) => {
+    if (!session) return;
+    if (!DEMO) await supabase.from('contacts').insert(imported.map(c => contactToRow(c, session.user.id)));
+    setContacts(prev => [...prev, ...imported]);
+  };
+
   const handleDeleteContact = async (id: string) => {
     if (!session) return;
     setContacts(prev => prev.filter(c => c.id !== id));
+    if (DEMO) return;
     await supabase.from('contacts').delete().eq('id', id).eq('user_id', session.user.id);
   };
 
@@ -207,6 +233,7 @@ export default function App() {
             contacts={contacts}
             onSaveContact={handleSaveContact}
             onDeleteContact={handleDeleteContact}
+            onImportContacts={handleImportContacts}
             allMaterials={allMaterials}
             onAddMaterial={handleAddMaterial}
             smsTemplate={userSettings.smsTemplate}

@@ -1,5 +1,5 @@
 import type { RegionCode, Country, Material } from '../../types';
-import { REGIONS } from '../../types';
+import { COUNTRY_NAMES, regionsOf } from '../../types';
 import { useLanguage } from '../../lib/LanguageContext';
 import { t } from '../../lib/i18n';
 import './ContactsFilter.css';
@@ -49,24 +49,34 @@ export function ContactsFilter({
       <div className="filter-selects">
         <select
           value={filterCountry}
-          onChange={e => onCountryChange(e.target.value as Country | '')}
+          onChange={e => {
+            onCountryChange(e.target.value as Country | '');
+            onRegionChange('');
+          }}
           className="filter-select"
         >
           <option value="">{t('filter_all_countries', lang)}</option>
           <option value="CZ">{t('filter_cz', lang)}</option>
-          <option value="zahraničí">{t('filter_foreign', lang)}</option>
+          <option value="SK">{t('filter_sk', lang)}</option>
+          <option value="EU">{t('filter_eu', lang)}</option>
         </select>
 
+        {filterCountry !== 'EU' && (
         <select
           value={filterRegion}
           onChange={e => onRegionChange(e.target.value as RegionCode | '')}
           className="filter-select"
         >
           <option value="">{t('filter_all_regions', lang)}</option>
-          {REGIONS.map(r => (
-            <option key={r.code} value={r.code}>{r.name}</option>
+          {(filterCountry ? [filterCountry] : (['CZ', 'SK'] as Country[])).map(country => (
+            <optgroup key={country} label={COUNTRY_NAMES[country]}>
+              {regionsOf(country).map(r => (
+                <option key={r.code} value={r.code}>{r.name}</option>
+              ))}
+            </optgroup>
           ))}
         </select>
+        )}
 
         <select
           value={filterMaterial}

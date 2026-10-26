@@ -40,6 +40,8 @@ const TEMPLATES: Record<string, (date: string) => string> = {
   FI: d => `Hyvää päivää, tiedotamme uudesta materiaalien ostosta ${d}. Odotamme yhteistyötänne. RegionFlow-tiimi`,
   PT: d => `Bom dia, informamos sobre uma nova compra de materiais em ${d}. Aguardamos a sua colaboração. Equipa RegionFlow`,
   RO: d => `Bună ziua, vă informăm despre o nouă achiziție de materiale pe ${d}. Așteptăm colaborarea dumneavoastră. Echipa RegionFlow`,
+  HR: d => `Dobar dan, obavještavamo Vas o novom otkupu materijala ${d}. Veselimo se suradnji. Tim RegionFlow`,
+  SI: d => `Dober dan, obveščamo Vas o novem odkupu materialov ${d}. Veselimo se sodelovanja. Ekipa RegionFlow`,
   GB: d => `Good day, we inform you of a new material purchase on ${d}. We look forward to your cooperation. RegionFlow Team`,
 };
 

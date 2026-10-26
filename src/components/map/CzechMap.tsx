@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { geoPath, geoMercator } from 'd3-geo';
 import type { FeatureCollection, Feature } from 'geojson';
-import type { RegionCode } from '../../types';
+import type { Country, RegionCode } from '../../types';
 import './CzechMap.css';
 
 interface RegionProperties {
@@ -12,6 +12,7 @@ interface RegionProperties {
 type RegionFeature = Feature & { properties: RegionProperties };
 
 interface CzechMapProps {
+  country: Exclude<Country, 'EU'>;
   selectedRegion: RegionCode | null;
   onRegionSelect: (code: RegionCode | null) => void;
   contactCountByRegion: Record<string, number>;
@@ -20,7 +21,20 @@ interface CzechMapProps {
 const W = 700;
 const H = 440;
 
+const GEO_URL: Record<Exclude<Country, 'EU'>, string> = {
+  CZ: '/czech-regions.geojson',
+  SK: '/slovak-regions.geojson',
+};
+
 const SHORT_NAMES: Record<string, string> = {
+  BA: 'Bratislavský',
+  TT: 'Trnavský',
+  TN: 'Trenčiansky',
+  NR: 'Nitriansky',
+  ZA: 'Žilinský',
+  BB: 'Banskobystrický',
+  PO: 'Prešovský',
+  KE: 'Košický',
   PHA: 'Praha',
   STC: 'Středočeský',
   JHC: 'Jihočeský',
@@ -40,18 +54,21 @@ const SHORT_NAMES: Record<string, string> = {
 const LABEL_OFFSETS: Record<string, [number, number]> = {
   PHA: [0, -16],
   STC: [55, -20],
+  BA: [0, 33],
+  TT: [10, -55],
 };
 
-export function CzechMap({ selectedRegion, onRegionSelect, contactCountByRegion }: CzechMapProps) {
+export function CzechMap({ country, selectedRegion, onRegionSelect, contactCountByRegion }: CzechMapProps) {
   const [geoData, setGeoData] = useState<FeatureCollection | null>(null);
   const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/czech-regions.geojson')
+    setGeoData(null);
+    fetch(GEO_URL[country])
       .then(r => r.json())
       .then((data: FeatureCollection) => setGeoData(data))
       .catch(console.error);
-  }, []);
+  }, [country]);
 
   const { pathGen, features } = useMemo(() => {
     if (!geoData) return { pathGen: null, features: [] as RegionFeature[] };

@@ -20,16 +20,17 @@ const MATERIAL_COLORS: string[] = [
 ];
 
 const NAMED_COLORS: Record<string, string> = {
-  kontakty: '#6366f1',
-  desky: '#0ea5e9',
-  konektory: '#f59e0b',
-  mobily: '#10b981',
-  elektronika: '#8b5cf6',
+  'železo': '#64748b',
+  'měď': '#c2410c',
+  'hliník': '#0ea5e9',
+  mosaz: '#ca8a04',
+  nerez: '#14b8a6',
+  olovo: '#6366f1',
   kabely: '#f43f5e',
-  cpu: '#14b8a6',
-  ram: '#fb923c',
-  hdd: '#a3e635',
-  ostatní: '#94a3b8',
+  'elektro šrot': '#8b5cf6',
+  autobaterie: '#16a34a',
+  'papír': '#0284c7',
+  plasty: '#db2777',
 };
 
 function getMaterialColor(name: string, index: number): string {

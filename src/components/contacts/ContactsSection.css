@@ -26,6 +26,20 @@
   animation: fadeIn 0.2s ease;
 }
 
+.area-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.area-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-right: 2px;
+}
+
 .contacts-table-section {
   width: 100%;
 }

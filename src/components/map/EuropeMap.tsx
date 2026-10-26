@@ -20,6 +20,8 @@ const W = 700;
 const H = 500;
 
 const EXCLUDED = ['RU', 'BY', 'UA', 'TR', 'GE', 'AM', 'AZ', 'IL'];
+// Have their own tabs with region maps.
+const OWN_TAB = ['CZ', 'SK'];
 
 export function EuropeMap({ selectedCountry, onCountrySelect, contactCountByCountry }: EuropeMapProps) {
   const [geoData, setGeoData] = useState<FeatureCollection | null>(null);
@@ -75,6 +77,10 @@ export function EuropeMap({ selectedCountry, onCountrySelect, contactCountByCoun
           const isHovered = hoveredCountry === code;
           const pathD = pathGen(feature) ?? '';
           const count = contactCountByCountry[code] ?? 0;
+
+          if (OWN_TAB.includes(code)) {
+            return <path key={code} d={pathD} className="europe-region own-tab" />;
+          }
 
           return (
             <path

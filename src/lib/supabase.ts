@@ -2,19 +2,29 @@ import { createClient } from '@supabase/supabase-js';
 import type { Contact, Material, UserSettings } from '../types';
 import type { Country, RegionCode } from '../types';
 
+// The demo build (VITE_DEMO=true) never talks to Supabase, so it may run without its keys.
 export const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL as string,
-  import.meta.env.VITE_SUPABASE_ANON_KEY as string,
+  (import.meta.env.VITE_SUPABASE_URL as string | undefined) ?? 'http://localhost',
+  (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined) ?? 'demo',
 );
+
+// DB keeps the original shape: 'CZ', or 'zahraničí' + eu_country code (Slovakia = 'SK').
+function rowCountry(row: Record<string, unknown>): Country {
+  if (row.country === 'CZ') return 'CZ';
+  if (row.country === 'SK' || row.eu_country === 'SK') return 'SK';
+  return 'EU';
+}
 
 export function rowToContact(row: Record<string, unknown>): Contact {
   return {
     id: row.id as string,
     name: row.name as string,
     phone: row.phone as string,
-    country: row.country as Country,
+    email: (row.email as string) ?? undefined,
+    emailEnabled: (row.email_enabled as boolean) ?? false,
+    country: rowCountry(row),
     region: (row.region as RegionCode) ?? undefined,
-    euCountry: (row.eu_country as string) ?? undefined,
+    euCountry: rowCountry(row) === 'EU' ? (row.eu_country as string) ?? undefined : undefined,
     city: row.city as string,
     street: row.street as string,
     materials: (row.materials as string[]) ?? [],
@@ -28,9 +38,9 @@ export function contactToRow(contact: Contact, userId: string) {
     user_id: userId,
     name: contact.name,
     phone: contact.phone,
-    country: contact.country,
+    country: contact.country === 'CZ' ? 'CZ' : 'zahraničí',
     region: contact.region ?? null,
-    eu_country: contact.euCountry ?? null,
+    eu_country: contact.country === 'SK' ? 'SK' : contact.country === 'EU' ? contact.euCountry ?? null : null,
     city: contact.city,
     street: contact.street,
     materials: contact.materials,

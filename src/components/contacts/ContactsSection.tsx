@@ -4,12 +4,15 @@ import { ContactsFilter } from './ContactsFilter';
 import { ContactsTable } from './ContactsTable';
 import { ContactModal } from './ContactModal';
 import { SmsModal } from '../sms/SmsModal';
+import { EmailModal } from '../email/EmailModal';
+import { ProfitEstimate } from './ProfitEstimate';
+import { CsvImportModal } from '../import/CsvImportModal';
 import { CzechMap } from '../map/CzechMap';
 import { EuropeMap } from '../map/EuropeMap';
 import { MapToggle } from '../map/MapToggle';
 import type { MapMode } from '../map/MapToggle';
 import type { Contact, RegionCode, Country, Material } from '../../types';
-import { REGIONS } from '../../types';
+import { REGIONS, euCountryName } from '../../types';
 import { useLanguage } from '../../lib/LanguageContext';
 import { t } from '../../lib/i18n';
 import './ContactsSection.css';
@@ -18,12 +21,13 @@ interface ContactsSectionProps {
   contacts: Contact[];
   onSaveContact: (contact: Contact) => void;
   onDeleteContact: (id: string) => void;
+  onImportContacts: (contacts: Contact[]) => void;
   allMaterials: Material[];
   onAddMaterial: (material: string) => void;
   smsTemplate?: string;
 }
 
-export function ContactsSection({ contacts, onSaveContact, onDeleteContact, allMaterials, onAddMaterial, smsTemplate }: ContactsSectionProps) {
+export function ContactsSection({ contacts, onSaveContact, onDeleteContact, onImportContacts, allMaterials, onAddMaterial, smsTemplate }: ContactsSectionProps) {
   const lang = useLanguage();
   const [mapMode, setMapMode] = useState<MapMode>('CZ');
   const [search, setSearch] = useState('');
@@ -34,6 +38,8 @@ export function ContactsSection({ contacts, onSaveContact, onDeleteContact, allM
   const [selectedEuCountry, setSelectedEuCountry] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [smsModalOpen, setSmsModalOpen] = useState(false);
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [editingContact, setEditingContact] = useState<Contact | undefined>(undefined);
 
   const openCreate = () => {
@@ -61,7 +67,7 @@ export function ContactsSection({ contacts, onSaveContact, onDeleteContact, allM
     setSelectedRegion(null);
     setSelectedEuCountry(null);
     setFilterRegion('');
-    setFilterCountry(mode === 'CZ' ? 'CZ' : 'zahraničí');
+    setFilterCountry(mode);
   };
 
   const handleRegionSelect = (code: RegionCode | null) => {
@@ -85,7 +91,7 @@ export function ContactsSection({ contacts, onSaveContact, onDeleteContact, allM
 
   const contactCountByRegion = useMemo(() => {
     const counts: Record<string, number> = {};
-    contacts.filter(c => c.country === 'CZ').forEach(c => {
+    contacts.forEach(c => {
       if (c.region) counts[c.region] = (counts[c.region] ?? 0) + 1;
     });
     return counts;
@@ -93,7 +99,7 @@ export function ContactsSection({ contacts, onSaveContact, onDeleteContact, allM
 
   const contactCountByEuCountry = useMemo(() => {
     const counts: Record<string, number> = {};
-    contacts.filter(c => c.country === 'zahraničí').forEach(c => {
+    contacts.filter(c => c.country === 'EU').forEach(c => {
       if (c.euCountry) counts[c.euCountry] = (counts[c.euCountry] ?? 0) + 1;
     });
     return counts;
@@ -109,21 +115,25 @@ export function ContactsSection({ contacts, onSaveContact, onDeleteContact, allM
     ? REGIONS.find(r => r.code === selectedRegion)?.name
     : null;
 
-  const smsRecipients = contacts.filter(c => {
-    if (!c.smsEnabled) return false;
-    if (selectedRegion) return c.region === selectedRegion;
-    if (selectedEuCountry) return c.euCountry === selectedEuCountry;
-    return false;
-  });
+  const inSelectedArea = (c: Contact) =>
+    selectedRegion ? c.region === selectedRegion : !!selectedEuCountry && c.country === 'EU' && c.euCountry === selectedEuCountry;
+  const smsRecipients = contacts.filter(c => c.smsEnabled && inSelectedArea(c));
+  const emailRecipients = contacts.filter(c => !!c.email && !!c.emailEnabled && inSelectedArea(c));
 
-  const smsAreaName = selectedRegionName ?? selectedEuCountry ?? '';
+  const selectedEuCountryName = selectedEuCountry ? euCountryName(selectedEuCountry) : null;
+  const smsAreaName = selectedRegionName ?? selectedEuCountryName ?? '';
 
   return (
     <>
       <Layout
         title={t('contacts_title', lang)}
         subtitle={`${filtered.length} ${t('contacts_subtitle', lang)} · ${smsCount} ${t('contacts_sms_active', lang)}`}
-        actions={<button className="btn-primary" onClick={openCreate}>{t('contacts_add', lang)}</button>}
+        actions={
+          <>
+            <button className="btn-secondary" onClick={() => setImportOpen(true)}>{t('contacts_import', lang)}</button>
+            <button className="btn-primary" onClick={openCreate}>{t('contacts_add', lang)}</button>
+          </>
+        }
       >
         <ContactsFilter
           search={search}
@@ -137,28 +147,37 @@ export function ContactsSection({ contacts, onSaveContact, onDeleteContact, allM
           allMaterials={allMaterials}
         />
 
+        <ProfitEstimate contacts={filtered} allMaterials={allMaterials} scopeName={selectedRegionName ?? selectedEuCountryName} />
+
         <div className="contacts-body">
           <div className="card contacts-map-card">
             <div className="contacts-map-header">
               <MapToggle mode={mapMode} onChange={handleMapModeChange} />
               {(selectedRegion || selectedEuCountry) && (
-                <button className="btn-primary sms-btn" onClick={() => setSmsModalOpen(true)}>
-                  ✉ SMS {selectedRegionName ?? selectedEuCountry}
-                </button>
+                <div className="area-actions">
+                  <span className="area-name">{smsAreaName}</span>
+                  <button className="btn-primary sms-btn" onClick={() => setSmsModalOpen(true)}>
+                    {t('send_sms', lang)} ({smsRecipients.length})
+                  </button>
+                  <button className="btn-primary sms-btn" onClick={() => setEmailModalOpen(true)}>
+                    {t('send_email', lang)} ({emailRecipients.length})
+                  </button>
+                </div>
               )}
             </div>
 
-            {mapMode === 'CZ' ? (
-              <CzechMap
-                selectedRegion={selectedRegion}
-                onRegionSelect={handleRegionSelect}
-                contactCountByRegion={contactCountByRegion}
-              />
-            ) : (
+            {mapMode === 'EU' ? (
               <EuropeMap
                 selectedCountry={selectedEuCountry}
                 onCountrySelect={setSelectedEuCountry}
                 contactCountByCountry={contactCountByEuCountry}
+              />
+            ) : (
+              <CzechMap
+                country={mapMode}
+                selectedRegion={selectedRegion}
+                onRegionSelect={handleRegionSelect}
+                contactCountByRegion={contactCountByRegion}
               />
             )}
           </div>
@@ -175,10 +194,29 @@ export function ContactsSection({ contacts, onSaveContact, onDeleteContact, allM
       {smsModalOpen && (
         <SmsModal
           areaName={smsAreaName}
-          countryCode={selectedRegion ? 'CZ' : (selectedEuCountry ?? 'CZ')}
+          countryCode={mapMode === 'EU' ? (selectedEuCountry ?? 'GB') : mapMode}
           recipients={smsRecipients}
           customTemplate={smsTemplate}
           onClose={() => setSmsModalOpen(false)}
+        />
+      )}
+
+      {importOpen && (
+        <CsvImportModal
+          existingContacts={contacts}
+          allMaterials={allMaterials.map(m => m.name)}
+          onAddMaterial={onAddMaterial}
+          onImport={onImportContacts}
+          onClose={() => setImportOpen(false)}
+        />
+      )}
+
+      {emailModalOpen && (
+        <EmailModal
+          areaName={smsAreaName}
+          country={mapMode}
+          recipients={emailRecipients}
+          onClose={() => setEmailModalOpen(false)}
         />
       )}
 

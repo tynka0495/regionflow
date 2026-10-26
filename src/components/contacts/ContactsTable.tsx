@@ -1,5 +1,5 @@
 import type { Contact } from '../../types';
-import { REGIONS } from '../../types';
+import { REGIONS, euCountryName } from '../../types';
 import { useLanguage } from '../../lib/LanguageContext';
 import { t } from '../../lib/i18n';
 import './ContactsTable.css';
@@ -10,16 +10,17 @@ interface ContactsTableProps {
 }
 
 const MATERIAL_COLORS: Record<string, string> = {
-  kontakty: '#6366f1',
-  desky: '#0ea5e9',
-  konektory: '#f59e0b',
-  mobily: '#10b981',
-  elektronika: '#8b5cf6',
+  'železo': '#64748b',
+  'měď': '#c2410c',
+  'hliník': '#0ea5e9',
+  mosaz: '#ca8a04',
+  nerez: '#14b8a6',
+  olovo: '#6366f1',
   kabely: '#f43f5e',
-  cpu: '#14b8a6',
-  ram: '#fb923c',
-  hdd: '#a3e635',
-  ostatní: '#94a3b8',
+  'elektro šrot': '#8b5cf6',
+  autobaterie: '#16a34a',
+  'papír': '#0284c7',
+  plasty: '#db2777',
 };
 
 export function ContactsTable({ contacts, onEdit }: ContactsTableProps) {
@@ -44,13 +45,19 @@ export function ContactsTable({ contacts, onEdit }: ContactsTableProps) {
           <thead>
             <tr>
               <th>{t('col_name', lang)}</th>
-              <th>{t('col_phone', lang)}</th>
+              <th>{t('col_contact', lang)}</th>
               <th>{t('col_region', lang)}</th>
               <th>{t('col_material', lang)}</th>
               <th>
                 <span className="th-sms">
                   SMS
                   <span className="th-tooltip" data-tooltip={t('sms_tooltip', lang)}>?</span>
+                </span>
+              </th>
+              <th>
+                <span className="th-sms">
+                  E-mail
+                  <span className="th-tooltip" data-tooltip={t('email_tooltip', lang)}>?</span>
                 </span>
               </th>
             </tr>
@@ -66,12 +73,14 @@ export function ContactsTable({ contacts, onEdit }: ContactsTableProps) {
                     </div>
                   </div>
                 </td>
-                <td className="contact-phone">{contact.phone}</td>
+                <td className="contact-reach">
+                  <div className="contact-phone">{contact.phone}</div>
+                  {contact.email && (
+                    <div className="contact-email" title={contact.email}>{contact.email}</div>
+                  )}
+                </td>
                 <td className="contact-region">
-                  {contact.country === 'CZ'
-                    ? getRegionName(contact.region)
-                    : <span className="badge-foreign">{t('badge_foreign', lang)}</span>
-                  }
+                  {contact.country === 'EU' ? euCountryName(contact.euCountry) : getRegionName(contact.region)}
                 </td>
                 <td>
                   <div className="material-badges">
@@ -89,6 +98,11 @@ export function ContactsTable({ contacts, onEdit }: ContactsTableProps) {
                 <td>
                   <span className={`sms-icon ${contact.smsEnabled ? 'on' : 'off'}`}>
                     {contact.smsEnabled ? '✓' : '✕'}
+                  </span>
+                </td>
+                <td>
+                  <span className={`sms-icon ${contact.emailEnabled ? 'on' : 'off'}`}>
+                    {contact.emailEnabled ? '✓' : '✕'}
                   </span>
                 </td>
               </tr>
