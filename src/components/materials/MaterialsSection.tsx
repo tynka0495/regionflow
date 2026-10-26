@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'; // useRef/useEffect used in MaterialModal
 import { Layout } from '../layout/Layout';
+import { MaterialsImportModal } from '../import/MaterialsImportModal';
 import type { Contact, Material } from '../../types';
 import { useLanguage } from '../../lib/LanguageContext';
 import { t } from '../../lib/i18n';
@@ -154,6 +155,7 @@ export function MaterialsSection({ contacts, allMaterials, onAddMaterial, onUpda
   const lang = useLanguage();
   const [editingMaterial, setEditingMaterial] = useState<Material | null>(null);
   const [addModalOpen, setAddModalOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
 
   const contactCountByMaterial = allMaterials.reduce<Record<string, number>>((acc, m) => {
     acc[m.name] = contacts.filter(c => c.materials.includes(m.name)).length;
@@ -165,9 +167,14 @@ export function MaterialsSection({ contacts, allMaterials, onAddMaterial, onUpda
       title={t('materials_title', lang)}
       subtitle={`${allMaterials.length} ${t('materials_subtitle_types', lang)}`}
       actions={
-        <button className="btn-primary" onClick={() => setAddModalOpen(true)}>
-          {t('materials_add', lang)}
-        </button>
+        <>
+          <button className="btn-secondary" onClick={() => setImportOpen(true)}>
+            {t('materials_import', lang)}
+          </button>
+          <button className="btn-primary" onClick={() => setAddModalOpen(true)}>
+            {t('materials_add', lang)}
+          </button>
+        </>
       }
     >
       <div className="materials-grid-section">
@@ -204,6 +211,15 @@ export function MaterialsSection({ contacts, allMaterials, onAddMaterial, onUpda
           );
         })}
       </div>
+
+      {importOpen && (
+        <MaterialsImportModal
+          allMaterials={allMaterials}
+          onAddMaterial={onAddMaterial}
+          onUpdateMaterial={onUpdateMaterial}
+          onClose={() => setImportOpen(false)}
+        />
+      )}
 
       {addModalOpen && (
         <MaterialModal

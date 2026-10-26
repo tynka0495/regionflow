@@ -106,3 +106,11 @@
 .csv-row-bad td {
   color: #dc2626;
 }
+
+.csv-row-muted td {
+  color: var(--text-muted);
+}
+
+.csv-toggle {
+  margin-top: 10px;
+}

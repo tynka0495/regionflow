@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Contact, Country, Material, RegionCode } from '../../types';
 import { regionsOf, EU_COUNTRIES } from '../../types';
 import { buildContactsTemplate, readSheet } from '../../lib/contactsSheet';
+import { normalize, parseBool, parseCsv } from '../../lib/sheetUtils';
 import '../sms/SmsModal.css';
 import './CsvImportModal.css';
 
@@ -36,15 +37,7 @@ const ALIASES: Record<string, Column> = {
   email_souhlas: 'email_souhlas', 'email souhlas': 'email_souhlas', 'e-mail souhlas': 'email_souhlas', 'souhlas email': 'email_souhlas',
 };
 
-const normalize = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 const digits = (s: string) => s.replace(/\D/g, '');
-
-function parseBool(value: string): boolean | null {
-  const v = normalize(value);
-  if (['ano', 'a', 'yes', 'y', '1', 'true', 'x'].includes(v)) return true;
-  if (['ne', 'n', 'no', '0', 'false', ''].includes(v)) return false;
-  return null;
-}
 
 function parseCountry(value: string): { country: Country; euCountry?: string } | null {
   const v = normalize(value);
@@ -58,32 +51,6 @@ function findRegion(country: Exclude<Country, 'EU'>, value: string): RegionCode 
   const v = normalize(value);
   if (!v) return undefined;
   return regionsOf(country).find(r => normalize(r.code) === v || normalize(r.name) === v || normalize(r.name).replace(/ kraj$|^kraj /, '') === v.replace(/ kraj$|^kraj /, ''))?.code;
-}
-
-function parseCsv(text: string): string[][] {
-  const clean = text.replace(/^\uFEFF/, '');
-  const firstLine = clean.split(/\r?\n/)[0] ?? '';
-  const delimiter = [';', ',', '\t'].sort((a, b) => firstLine.split(b).length - firstLine.split(a).length)[0];
-
-  const rows: string[][] = [];
-  let row: string[] = [];
-  let field = '';
-  let quoted = false;
-  for (let i = 0; i < clean.length; i++) {
-    const ch = clean[i];
-    if (quoted) {
-      if (ch === '"' && clean[i + 1] === '"') { field += '"'; i++; }
-      else if (ch === '"') quoted = false;
-      else field += ch;
-    } else if (ch === '"') quoted = true;
-    else if (ch === delimiter) { row.push(field); field = ''; }
-    else if (ch === '\n' || ch === '\r') {
-      if (ch === '\r' && clean[i + 1] === '\n') i++;
-      row.push(field); rows.push(row); row = []; field = '';
-    } else field += ch;
-  }
-  if (field || row.length) { row.push(field); rows.push(row); }
-  return rows.filter(r => r.some(cell => cell.trim()));
 }
 
 function validateRows(table: string[][], existing: Contact[], allMaterials: string[]): { rows: ParsedRow[]; headerError?: string } {

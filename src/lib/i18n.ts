@@ -72,6 +72,7 @@ const translations = {
 
   // Materials section
   materials_title:   { cs: 'Materiály',          en: 'Materials'       },
+  materials_import:  { cs: '⬆ Import z Excelu', en: '⬆ Import Excel' },
   materials_add:     { cs: '+ Přidat materiál',  en: '+ Add material'  },
   materials_subtitle_types: { cs: 'typů materiálů', en: 'material types' },
 

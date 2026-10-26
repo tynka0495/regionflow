@@ -9,8 +9,15 @@ interface ProfitEstimateProps {
   scopeName?: string | null;
 }
 
-const QTY_BY_UNIT: Record<NonNullable<Material['unit']>, number> = { kg: 25, ks: 4, t: 0.05 };
-const qtyFor = (m: Material) => QTY_BY_MATERIAL[m.name] ?? QTY_BY_UNIT[m.unit ?? 'kg'];
+const FALLBACK_KG_PER_PICKUP = 25;
+const FALLBACK_PIECES_PER_PICKUP = 4;
+
+// Value paid out per pickup; QTY_BY_MATERIAL is in kg, so prices per tonne are converted.
+function payoutPerPickup(m: Material & { price: number }): number {
+  if (m.unit === 'ks') return m.price * FALLBACK_PIECES_PER_PICKUP;
+  const pricePerKg = m.unit === 't' ? m.price / 1000 : m.price;
+  return pricePerKg * (QTY_BY_MATERIAL[m.name] ?? FALLBACK_KG_PER_PICKUP);
+}
 
 const fmt = (n: number) => `${Math.round(n).toLocaleString('cs-CZ')} Kč`;
 
@@ -23,7 +30,7 @@ export function ProfitEstimate({ contacts, allMaterials, scopeName }: ProfitEsti
     const perPickup = (c: Contact) => c.materials.reduce((sum, name) => {
       const m = priceByName.get(name);
       if (!m?.price) return sum;
-      return sum + m.price * qtyFor(m) * (margin / 100);
+      return sum + payoutPerPickup({ ...m, price: m.price }) * (margin / 100);
     }, 0);
 
     const values = contacts.map(c => ({ c, value: perPickup(c) }));

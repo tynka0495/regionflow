@@ -62,14 +62,15 @@ export async function buildContactsTemplate(materialList: Material[]): Promise<A
 
   const countryCodes = ['CZ', 'SK', ...EU_COUNTRIES.map(c => c.code)];
   const countryLabels = ['Česká republika', 'Slovenská republika', ...EU_COUNTRIES.map(c => c.name)];
-  prices.addRow(['Materiál', 'Jednotka', 'Výkupní cena (Kč)', 'Prodejní cena (Kč)', 'Marže (Kč)', 'Marže (%)', 'Průměrné množství na 1 výkup', 'Kdo doplní']);
+  prices.addRow(['Materiál', 'Jednotka', 'Výkupní cena (Kč)', 'Prodejní cena (Kč)', 'Marže (Kč)', 'Marže (%)', 'Průměrné množství na 1 výkup', 'Kdo doplní', 'Vykupuje se']);
   materialList.forEach((m, i) => {
     const r = i + 2;
-    prices.addRow([m.name, m.unit ?? 'kg', m.price ?? null, null, { formula: `IF(D${r}="","",D${r}-C${r})` }, { formula: `IF(D${r}="","",(D${r}-C${r})/D${r})` }, QTY_BY_MATERIAL[m.name] ?? null, 'výkup: provozovna · prodej: controlling']);
+    prices.addRow([m.name, m.unit ?? 'kg', m.price ?? null, null, { formula: `IF(D${r}="","",D${r}-C${r})` }, { formula: `IF(D${r}="","",(D${r}-C${r})/D${r})` }, QTY_BY_MATERIAL[m.name] ?? null, 'výkup: provozovna · prodej: controlling', m.active === false ? 'ne' : 'ano']);
+    prices.getCell(r, 9).dataValidation = { type: 'list', allowBlank: true, formulae: ['"ano,ne"'] };
     prices.getCell(r, 4).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF9C3' } };
   });
-  styleHeader(prices, ['FF4F46E5', 'FF4F46E5', 'FF4F46E5', 'FFCA8A04', 'FF64748B', 'FF64748B', 'FF4F46E5', 'FF64748B']);
-  [16, 10, 16, 18, 12, 11, 18, 36].forEach((w, i) => { prices.getColumn(i + 1).width = w; });
+  styleHeader(prices, ['FF4F46E5', 'FF4F46E5', 'FF4F46E5', 'FFCA8A04', 'FF64748B', 'FF64748B', 'FF4F46E5', 'FF64748B', 'FF4F46E5']);
+  [16, 10, 16, 18, 12, 11, 18, 36, 12].forEach((w, i) => { prices.getColumn(i + 1).width = w; });
   prices.getColumn(6).numFmt = '0.0%';
 
   purchases.addRow(['Datum', 'Telefon dodavatele', 'Jméno / firma', 'Provozovna', 'Materiál', 'Množství (kg)', 'Výkupní cena (Kč/kg)', 'Vyplaceno (Kč)']);
@@ -117,12 +118,13 @@ export async function buildContactsTemplate(materialList: Material[]): Promise<A
     'List „Ceník“ – podklad pro skutečný odhad zisku',
     '• Výkupní cenu doplní provozovna, PRODEJNÍ cenu (žlutý sloupec – za kolik materiál prodáváte zpracovatelům) doplní controlling.',
     '• Marže se dopočítá sama. Průměrné množství na 1 výkup je náš odhad – upravte ho podle skutečnosti.',
+    '• Ceník jde nahrát v aplikaci v sekci Materiály → Import z Excelu: nové materiály se přidají, u existujících se aktualizuje výkupní cena, jednotka a „Vykupuje se“.',
     '',
     'List „Výkupy“ – evidence výkupů',
     '• Jeden řádek = jeden materiál z jednoho výkupu (stačí export z vážního systému nebo z výkupních dokladů).',
     '• Z výkupů se dá spočítat skutečný zisk na člověka, provozovnu i kraj a najít lidi, kteří dlouho nic nepřinesli.',
     '',
-    'Pozn.: Aplikace zatím při importu načítá list „Kontakty“. Listy „Ceník“ a „Výkupy“ slouží jako podklad pro další krok.',
+    'Pozn.: Prodejní cena, marže a list „Výkupy“ zatím slouží jako podklad pro další krok – aplikace je zatím nenačítá.',
   ].forEach((line, i) => {
     help.addRow([line]);
     if (i === 0) help.getRow(1).font = { bold: true, size: 14 };
@@ -132,11 +134,11 @@ export async function buildContactsTemplate(materialList: Material[]): Promise<A
   return wb.xlsx.writeBuffer() as Promise<ArrayBuffer>;
 }
 
-export async function readSheet(buffer: ArrayBuffer): Promise<string[][]> {
+export async function readSheet(buffer: ArrayBuffer, preferredSheet = 'Kontakty'): Promise<string[][]> {
   const { default: ExcelJS } = await import('exceljs');
   const wb = new ExcelJS.Workbook();
   await wb.xlsx.load(buffer);
-  const sheet = wb.getWorksheet('Kontakty') ?? wb.worksheets[0];
+  const sheet = wb.getWorksheet(preferredSheet) ?? wb.worksheets[0];
   if (!sheet) return [];
   const rows: string[][] = [];
   sheet.eachRow({ includeEmpty: false }, row => {
