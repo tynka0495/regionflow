@@ -5,7 +5,6 @@ import { ContactsTable } from './ContactsTable';
 import { ContactModal } from './ContactModal';
 import { SmsModal } from '../sms/SmsModal';
 import { EmailModal } from '../email/EmailModal';
-import { ProfitEstimate } from './ProfitEstimate';
 import { CsvImportModal } from '../import/CsvImportModal';
 import { CzechMap } from '../map/CzechMap';
 import { EuropeMap } from '../map/EuropeMap';
@@ -41,6 +40,7 @@ export function ContactsSection({ contacts, onSaveContact, onDeleteContact, onIm
   const [emailModalOpen, setEmailModalOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [editingContact, setEditingContact] = useState<Contact | undefined>(undefined);
+  const [singleRecipient, setSingleRecipient] = useState<{ kind: 'sms' | 'email'; contact: Contact } | null>(null);
 
   const openCreate = () => {
     setEditingContact(undefined);
@@ -139,15 +139,17 @@ export function ContactsSection({ contacts, onSaveContact, onDeleteContact, onIm
           search={search}
           onSearchChange={setSearch}
           filterRegion={filterRegion}
-          onRegionChange={setFilterRegion}
+          onRegionChange={code => handleRegionSelect(code || null)}
           filterCountry={filterCountry}
-          onCountryChange={setFilterCountry}
+          onCountryChange={country => {
+            setFilterCountry(country);
+            setSelectedEuCountry(null);
+          }}
           filterMaterial={filterMaterial}
           onMaterialChange={setFilterMaterial}
           allMaterials={allMaterials}
         />
 
-        <ProfitEstimate contacts={filtered} allMaterials={allMaterials} scopeName={selectedRegionName ?? selectedEuCountryName} />
 
         <div className="contacts-body">
           <div className="card contacts-map-card">
@@ -186,6 +188,8 @@ export function ContactsSection({ contacts, onSaveContact, onDeleteContact, onIm
             <ContactsTable
               contacts={filtered}
               onEdit={openEdit}
+              onSendSms={contact => setSingleRecipient({ kind: 'sms', contact })}
+              onSendEmail={contact => setSingleRecipient({ kind: 'email', contact })}
             />
           </div>
         </div>
@@ -198,6 +202,25 @@ export function ContactsSection({ contacts, onSaveContact, onDeleteContact, onIm
           recipients={smsRecipients}
           customTemplate={smsTemplate}
           onClose={() => setSmsModalOpen(false)}
+        />
+      )}
+
+      {singleRecipient?.kind === 'sms' && (
+        <SmsModal
+          areaName={singleRecipient.contact.name}
+          countryCode={singleRecipient.contact.country === 'EU' ? (singleRecipient.contact.euCountry ?? 'GB') : singleRecipient.contact.country}
+          recipients={[singleRecipient.contact]}
+          customTemplate={smsTemplate}
+          onClose={() => setSingleRecipient(null)}
+        />
+      )}
+
+      {singleRecipient?.kind === 'email' && (
+        <EmailModal
+          areaName={singleRecipient.contact.name}
+          country={singleRecipient.contact.country}
+          recipients={[singleRecipient.contact]}
+          onClose={() => setSingleRecipient(null)}
         />
       )}
 

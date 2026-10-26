@@ -5,6 +5,7 @@ import { LanguageContext } from './lib/LanguageContext';
 import type { Lang } from './lib/i18n';
 import { t } from './lib/i18n';
 import { Sidebar } from './components/layout/Sidebar';
+import { OverviewSection } from './components/overview/OverviewSection';
 import { ContactsSection } from './components/contacts/ContactsSection';
 import { MaterialsSection } from './components/materials/MaterialsSection';
 import { SettingsSection } from './components/settings/SettingsSection';
@@ -180,8 +181,12 @@ export default function App() {
 
   const handleImportContacts = async (imported: Contact[]) => {
     if (!session) return;
-    if (!DEMO) await supabase.from('contacts').insert(imported.map(c => contactToRow(c, session.user.id)));
-    setContacts(prev => [...prev, ...imported]);
+    if (!DEMO) await supabase.from('contacts').upsert(imported.map(c => contactToRow(c, session.user.id)));
+    const importedById = new Map(imported.map(c => [c.id, c]));
+    setContacts(prev => [
+      ...prev.map(c => importedById.get(c.id) ?? c),
+      ...imported.filter(c => !prev.some(p => p.id === c.id)),
+    ]);
   };
 
   const handleDeleteContact = async (id: string) => {
@@ -196,6 +201,7 @@ export default function App() {
   const NAV_ITEMS: { id: ActiveSection; label: string; icon: string }[] = [
     { id: 'contacts', label: t('nav_contacts', lang), icon: '👥' },
     { id: 'materials', label: t('nav_materials', lang), icon: '♻️' },
+    { id: 'overview', label: t('nav_overview', lang), icon: '📊' },
     { id: 'settings', label: t('nav_settings', lang), icon: '⚙️' },
   ];
 
@@ -238,6 +244,9 @@ export default function App() {
             onAddMaterial={handleAddMaterial}
             smsTemplate={userSettings.smsTemplate}
           />
+        )}
+        {activeSection === 'overview' && (
+          <OverviewSection contacts={contacts} allMaterials={allMaterials} />
         )}
         {activeSection === 'materials' && (
           <MaterialsSection

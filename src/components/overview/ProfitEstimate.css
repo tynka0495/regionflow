@@ -77,3 +77,51 @@
   font-size: 11px;
   color: var(--text-muted);
 }
+
+.profit-materials {
+  margin-top: 14px;
+}
+
+.profit-materials ul {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.profit-material {
+  display: grid;
+  grid-template-columns: 110px 1fr 70px 110px;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.profit-material-name {
+  font-weight: 500;
+}
+
+.profit-material-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.profit-material-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--primary);
+}
+
+.profit-material-people,
+.profit-material-payout {
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}

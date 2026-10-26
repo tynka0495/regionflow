@@ -39,3 +39,12 @@ export function parseNumber(value: string): number | null {
   const n = parseFloat(cleaned);
   return isNaN(n) ? null : n;
 }
+
+// Explains why the import button is disabled, or returns undefined when there is something to import.
+export function importDisabledReason(counts: { rows: number; added: number; updated: number; errors: number; allowUpdate: boolean }): string | undefined {
+  if (counts.rows === 0) return 'Nejdřív vyberte soubor.';
+  if (counts.added > 0 || (counts.allowUpdate && counts.updated > 0)) return undefined;
+  if (counts.updated > 0) return 'Jsou tu jen změny existujících záznamů – zapněte „Aktualizovat existující“.';
+  if (counts.errors === counts.rows) return 'Žádný řádek nejde nahrát – opravte chyby v souboru.';
+  return 'Nic se nezměnilo – data v souboru jsou stejná jako současná.';
+}

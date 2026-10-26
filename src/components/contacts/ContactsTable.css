@@ -140,6 +140,44 @@
   color: #cbd5e1;
 }
 
+.send-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border: none;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #16a34a;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.send-pill-label {
+  display: none;
+  font-weight: 600;
+}
+
+.send-pill:hover,
+.send-pill:focus-visible {
+  background: #16a34a;
+  color: #fff;
+}
+
+.send-pill:hover .send-pill-check,
+.send-pill:focus-visible .send-pill-check {
+  display: none;
+}
+
+.send-pill:hover .send-pill-label,
+.send-pill:focus-visible .send-pill-label {
+  display: inline;
+}
+
 .th-sms {
   display: inline-flex;
   align-items: center;

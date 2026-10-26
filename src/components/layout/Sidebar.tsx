@@ -15,6 +15,7 @@ export function Sidebar({ activeSection, onSectionChange, userEmail, onLogout }:
   const NAV_ITEMS: { id: ActiveSection; label: string; icon: string }[] = [
     { id: 'contacts', label: t('nav_contacts', lang), icon: '👥' },
     { id: 'materials', label: t('nav_materials', lang), icon: '♻️' },
+    { id: 'overview', label: t('nav_overview', lang), icon: '📊' },
     { id: 'settings', label: t('nav_settings', lang), icon: '⚙️' },
   ];
   const initials = userEmail ? userEmail.charAt(0).toUpperCase() : '?';

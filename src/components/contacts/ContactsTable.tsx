@@ -7,6 +7,25 @@ import './ContactsTable.css';
 interface ContactsTableProps {
   contacts: Contact[];
   onEdit: (contact: Contact) => void;
+  onSendSms: (contact: Contact) => void;
+  onSendEmail: (contact: Contact) => void;
+}
+
+function SendCell({ enabled, onSend }: { enabled: boolean; onSend: () => void }) {
+  if (!enabled) return <span className="sms-icon off">✕</span>;
+  return (
+    <button
+      type="button"
+      className="send-pill"
+      onClick={e => {
+        e.stopPropagation();
+        onSend();
+      }}
+    >
+      <span className="send-pill-check">✓</span>
+      <span className="send-pill-label">Poslat</span>
+    </button>
+  );
 }
 
 const MATERIAL_COLORS: Record<string, string> = {
@@ -23,7 +42,7 @@ const MATERIAL_COLORS: Record<string, string> = {
   plasty: '#db2777',
 };
 
-export function ContactsTable({ contacts, onEdit }: ContactsTableProps) {
+export function ContactsTable({ contacts, onEdit, onSendSms, onSendEmail }: ContactsTableProps) {
   const lang = useLanguage();
 
   const getRegionName = (code?: string) =>
@@ -96,14 +115,10 @@ export function ContactsTable({ contacts, onEdit }: ContactsTableProps) {
                   </div>
                 </td>
                 <td>
-                  <span className={`sms-icon ${contact.smsEnabled ? 'on' : 'off'}`}>
-                    {contact.smsEnabled ? '✓' : '✕'}
-                  </span>
+                  <SendCell enabled={contact.smsEnabled} onSend={() => onSendSms(contact)} />
                 </td>
                 <td>
-                  <span className={`sms-icon ${contact.emailEnabled ? 'on' : 'off'}`}>
-                    {contact.emailEnabled ? '✓' : '✕'}
-                  </span>
+                  <SendCell enabled={!!contact.email && !!contact.emailEnabled} onSend={() => onSendEmail(contact)} />
                 </td>
               </tr>
             ))}

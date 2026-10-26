@@ -83,7 +83,7 @@ export interface Region {
   country: Country;
 }
 
-export type ActiveSection = 'contacts' | 'materials' | 'settings';
+export type ActiveSection = 'contacts' | 'overview' | 'materials' | 'settings';
 
 export interface UserSettings {
   smsTemplate?: string;

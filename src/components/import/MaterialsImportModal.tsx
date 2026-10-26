@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { Material } from '../../types';
 import { buildMaterialsTemplate, MATERIALS_SHEET, readSheet } from '../../lib/contactsSheet';
-import { normalize, parseBool, parseCsv, parseNumber } from '../../lib/sheetUtils';
+import { importDisabledReason, normalize, parseBool, parseCsv, parseNumber } from '../../lib/sheetUtils';
 import '../sms/SmsModal.css';
 import './CsvImportModal.css';
 
@@ -47,7 +47,7 @@ function validateMaterials(table: string[][], existing: Material[]): { rows: Par
     const get = (col: Column) => (header.includes(col) ? (cells[header.indexOf(col)] ?? '').trim() : '');
     const name = get('name').toLowerCase();
     const errors: string[] = [];
-    const base = { line: i + 2, name: name || '—', changes: [] as string[], errors };
+    const base = { line: i + 1, name: name || '—', changes: [] as string[], errors };
 
     if (!name) errors.push('chybí název');
     else if (seen.has(normalize(name))) errors.push('materiál je v souboru dvakrát');
@@ -102,6 +102,7 @@ export function MaterialsImportModal({ allMaterials, onAddMaterial, onUpdateMate
   const toUpdate = rows.filter(r => r.status === 'update');
   const errorRows = rows.filter(r => r.status === 'error');
   const actionable = toAdd.length + (allowUpdate ? toUpdate.length : 0);
+  const disabledReason = importDisabledReason({ rows: rows.length, added: toAdd.length, updated: toUpdate.length, errors: errorRows.length, allowUpdate });
 
   const downloadTemplate = async () => {
     const buffer = await buildMaterialsTemplate(allMaterials);
@@ -208,9 +209,11 @@ export function MaterialsImportModal({ allMaterials, onAddMaterial, onUpdateMate
 
             <div className="modal-footer">
               <button type="button" className="btn-secondary" onClick={onClose}>Zrušit</button>
-              <button className="btn-primary" onClick={handleImport} disabled={actionable === 0}>
-                Nahrát {actionable > 0 && `(${actionable})`}
-              </button>
+              <span className="import-btn-wrap" data-tooltip={disabledReason}>
+                <button className="btn-primary" onClick={handleImport} disabled={!!disabledReason}>
+                  Nahrát {actionable > 0 && `(${actionable})`}
+                </button>
+              </span>
             </div>
           </>
         )}

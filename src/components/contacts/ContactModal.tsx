@@ -319,12 +319,14 @@ export function ContactModal({ contact, allMaterials, onAddMaterial, onSave, onD
                 </button>
               )
             )}
-            <div className="footer-actions">
-              <button type="button" className="btn-secondary" onClick={onClose}>{t('btn_cancel', lang)}</button>
-              <button type="submit" className="btn-primary">
-                {isEdit ? t('btn_save', lang) : t('btn_add_contact', lang)}
-              </button>
-            </div>
+            {!confirmDelete && (
+              <div className="footer-actions">
+                <button type="button" className="btn-secondary" onClick={onClose}>{t('btn_cancel', lang)}</button>
+                <button type="submit" className="btn-primary">
+                  {isEdit ? t('btn_save', lang) : t('btn_add_contact', lang)}
+                </button>
+              </div>
+            )}
           </div>
         </form>
       </div>

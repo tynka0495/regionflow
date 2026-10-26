@@ -137,12 +137,14 @@ function MaterialModal({ material, onSave, onDelete, onClose }: MaterialModalPro
                 </button>
               )
             )}
-            <div className="footer-actions">
-              <button type="button" className="btn-secondary" onClick={onClose}>Zrušit</button>
-              <button type="submit" className="btn-primary">
-                {isNew ? 'Přidat' : 'Uložit'}
-              </button>
-            </div>
+            {!confirmDelete && (
+              <div className="footer-actions">
+                <button type="button" className="btn-secondary" onClick={onClose}>Zrušit</button>
+                <button type="submit" className="btn-primary">
+                  {isNew ? 'Přidat' : 'Uložit'}
+                </button>
+              </div>
+            )}
           </div>
         </form>
       </div>

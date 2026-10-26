@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { Contact, Country, Material, RegionCode } from '../../types';
 import { regionsOf, EU_COUNTRIES } from '../../types';
 import { buildContactsTemplate, readSheet } from '../../lib/contactsSheet';
-import { normalize, parseBool, parseCsv } from '../../lib/sheetUtils';
+import { importDisabledReason, normalize, parseBool, parseCsv } from '../../lib/sheetUtils';
 import '../sms/SmsModal.css';
 import './CsvImportModal.css';
 
@@ -14,13 +14,28 @@ interface CsvImportModalProps {
   onClose: () => void;
 }
 
+type RowStatus = 'new' | 'update' | 'same' | 'error';
+
 interface ParsedRow {
   line: number;
   name: string;
+  status: RowStatus;
   contact?: Contact;
   errors: string[];
   newMaterials: string[];
 }
+
+const STATUS_LABEL: Record<RowStatus, string> = {
+  new: 'nový',
+  update: 'změna',
+  same: 'beze změny',
+  error: 'chyba',
+};
+
+const comparable = (c: Contact) => JSON.stringify([
+  c.name, c.phone, c.email ?? '', !!c.emailEnabled, c.country, c.region ?? '', c.euCountry ?? '',
+  c.city, c.street, [...c.materials].sort(), c.smsEnabled,
+]);
 
 type Column = 'jmeno' | 'telefon' | 'email' | 'zeme' | 'kraj' | 'mesto' | 'ulice' | 'materialy' | 'sms' | 'email_souhlas';
 
@@ -64,7 +79,8 @@ function validateRows(table: string[][], existing: Contact[], allMaterials: stri
   if (!header.includes('materialy') && materialColumns.length === 0) missing.push('materialy');
   if (missing.length) return { rows: [], headerError: `V hlavičce chybí sloupce: ${missing.join(', ')}. Stáhněte si šablonu.` };
 
-  const knownPhones = new Set(existing.map(c => digits(c.phone)));
+  const existingByPhone = new Map(existing.map(c => [digits(c.phone), c]));
+  const phonesInFile = new Set<string>();
   const knownMaterials = new Set(allMaterials);
 
   const rows = table.slice(1).map((cells, i): ParsedRow => {
@@ -86,7 +102,7 @@ function validateRows(table: string[][], existing: Contact[], allMaterials: stri
 
     if (!name) errors.push('chybí jméno');
     if (!phone) errors.push('chybí telefon');
-    else if (knownPhones.has(digits(phone))) errors.push('telefon už je v kontaktech');
+    else if (phonesInFile.has(digits(phone))) errors.push('telefon je v souboru vícekrát');
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push('neplatný e-mail');
     if (!city) errors.push('chybí město');
     if (materials.length === 0) errors.push('chybí materiál');
@@ -100,29 +116,27 @@ function validateRows(table: string[][], existing: Contact[], allMaterials: stri
 
     const newMaterials = materials.filter(m => !knownMaterials.has(m));
 
-    if (errors.length || !country) return { line: i + 2, name: name || '—', errors, newMaterials };
+    if (errors.length || !country) return { line: i + 1, name: name || '—', status: 'error', errors, newMaterials };
 
-    knownPhones.add(digits(phone));
-    return {
-      line: i + 2,
+    phonesInFile.add(digits(phone));
+    const existingContact = existingByPhone.get(digits(phone));
+    const contact: Contact = {
+      ...existingContact,
+      id: existingContact?.id ?? crypto.randomUUID(),
       name,
-      errors,
-      newMaterials,
-      contact: {
-        id: crypto.randomUUID(),
-        name,
-        phone,
-        email: email || undefined,
-        emailEnabled: !!email && !!emailConsent,
-        country,
-        region,
-        euCountry: parsedCountry?.euCountry,
-        city,
-        street: get('ulice'),
-        materials,
-        smsEnabled: !!sms,
-      },
+      phone,
+      email: email || undefined,
+      emailEnabled: !!email && !!emailConsent,
+      country,
+      region,
+      euCountry: parsedCountry?.euCountry,
+      city,
+      street: get('ulice'),
+      materials,
+      smsEnabled: !!sms,
     };
+    const status: RowStatus = !existingContact ? 'new' : comparable(existingContact) === comparable(contact) ? 'same' : 'update';
+    return { line: i + 1, name, status, errors, newMaterials, contact };
   });
 
   return { rows };
@@ -132,11 +146,15 @@ export function CsvImportModal({ existingContacts, allMaterials, onAddMaterial, 
   const [fileName, setFileName] = useState('');
   const [rows, setRows] = useState<ParsedRow[]>([]);
   const [headerError, setHeaderError] = useState<string>();
-  const [importedCount, setImportedCount] = useState<number | null>(null);
+  const [allowUpdate, setAllowUpdate] = useState(true);
+  const [result, setResult] = useState<{ added: number; updated: number } | null>(null);
 
-  const valid = rows.filter(r => r.contact);
-  const invalid = rows.filter(r => !r.contact);
-  const newMaterials = [...new Set(valid.flatMap(r => r.newMaterials))];
+  const toAdd = rows.filter(r => r.status === 'new');
+  const toUpdate = rows.filter(r => r.status === 'update');
+  const invalid = rows.filter(r => r.status === 'error');
+  const toImport = [...toAdd, ...(allowUpdate ? toUpdate : [])];
+  const newMaterials = [...new Set(toImport.flatMap(r => r.newMaterials))];
+  const disabledReason = importDisabledReason({ rows: rows.length, added: toAdd.length, updated: toUpdate.length, errors: invalid.length, allowUpdate });
 
   const downloadTemplate = async () => {
     const buffer = await buildContactsTemplate(allMaterials);
@@ -166,8 +184,8 @@ export function CsvImportModal({ existingContacts, allMaterials, onAddMaterial, 
 
   const handleImport = () => {
     newMaterials.forEach(onAddMaterial);
-    onImport(valid.map(r => r.contact!));
-    setImportedCount(valid.length);
+    onImport(toImport.map(r => r.contact!));
+    setResult({ added: toAdd.length, updated: allowUpdate ? toUpdate.length : 0 });
   };
 
   return (
@@ -181,10 +199,11 @@ export function CsvImportModal({ existingContacts, allMaterials, onAddMaterial, 
           <button className="modal-close" onClick={onClose}>✕</button>
         </div>
 
-        {importedCount !== null ? (
+        {result ? (
           <div className="sms-success">
             <div className="sms-success-icon">✓</div>
-            <h3>Importováno {importedCount} kontaktů</h3>
+            <h3>Kontakty nahrány</h3>
+            <p>Přidáno {result.added}, aktualizováno {result.updated}.</p>
             {invalid.length > 0 && <p>{invalid.length} řádků s chybou bylo přeskočeno.</p>}
             <button className="btn-primary" onClick={onClose}>Zavřít</button>
           </div>
@@ -210,25 +229,32 @@ export function CsvImportModal({ existingContacts, allMaterials, onAddMaterial, 
               {rows.length > 0 && (
                 <>
                   <div className="csv-summary">
-                    <span className="csv-ok">✓ {valid.length} připraveno k importu</span>
+                    <span className="csv-ok">＋ {toAdd.length} nových</span>
+                    <span className="csv-ok">✎ {toUpdate.length} změn</span>
                     {invalid.length > 0 && <span className="csv-bad">✕ {invalid.length} s chybou (přeskočí se)</span>}
                   </div>
+
+                  <label className="sms-toggle csv-toggle">
+                    <input type="checkbox" checked={allowUpdate} onChange={e => setAllowUpdate(e.target.checked)} />
+                    <span className="sms-toggle-track" />
+                    <span className="sms-toggle-label">Aktualizovat existující kontakty (podle telefonu)</span>
+                  </label>
                   {newMaterials.length > 0 && (
                     <p className="csv-note">Nové materiály se přidají do seznamu: {newMaterials.join(', ')}</p>
                   )}
                   <div className="csv-table-wrap">
                     <table className="csv-table">
                       <thead>
-                        <tr><th>Řádek</th><th>Jméno</th><th>SMS</th><th>E-mail</th><th>Stav</th></tr>
+                        <tr><th>Řádek</th><th>Jméno</th><th>Telefon / SMS</th><th>E-mail</th><th>Stav</th></tr>
                       </thead>
                       <tbody>
                         {rows.map(r => (
-                          <tr key={r.line} className={r.contact ? '' : 'csv-row-bad'}>
+                          <tr key={r.line} className={r.status === 'error' ? 'csv-row-bad' : r.status === 'same' ? 'csv-row-muted' : ''}>
                             <td>{r.line}</td>
                             <td>{r.name}</td>
-                            <td>{r.contact ? (r.contact.smsEnabled ? '✓' : '✕') : ''}</td>
-                            <td>{r.contact ? (r.contact.emailEnabled ? `✓ ${r.contact.email}` : (r.contact.email ?? '—')) : ''}</td>
-                            <td>{r.contact ? 'OK' : r.errors.join(', ')}</td>
+                            <td>{r.contact ? `${r.contact.smsEnabled ? '✓' : '✕'} ${r.contact.phone}` : ''}</td>
+                            <td>{r.contact ? (r.contact.email ? `${r.contact.emailEnabled ? '✓' : '✕'} ${r.contact.email}` : '—') : ''}</td>
+                            <td>{r.status === 'error' ? r.errors.join(', ') : r.status === 'update' && !allowUpdate ? 'změna (přeskočí se)' : STATUS_LABEL[r.status]}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -240,9 +266,11 @@ export function CsvImportModal({ existingContacts, allMaterials, onAddMaterial, 
 
             <div className="modal-footer">
               <button type="button" className="btn-secondary" onClick={onClose}>Zrušit</button>
-              <button className="btn-primary" onClick={handleImport} disabled={valid.length === 0}>
-                Importovat {valid.length > 0 && `(${valid.length})`}
-              </button>
+              <span className="import-btn-wrap" data-tooltip={disabledReason}>
+                <button className="btn-primary" onClick={handleImport} disabled={!!disabledReason}>
+                  Importovat {toImport.length > 0 && `(${toImport.length})`}
+                </button>
+              </span>
             </div>
           </>
         )}

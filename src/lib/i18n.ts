@@ -3,6 +3,7 @@ export type Lang = 'cs' | 'en';
 const translations = {
   // Navigation
   nav_contacts:  { cs: 'Kontakty',  en: 'Contacts'  },
+  nav_overview:  { cs: 'Přehled výkupu', en: 'Buyout overview' },
   nav_materials: { cs: 'Materiály', en: 'Materials'  },
   nav_settings:  { cs: 'Nastavení', en: 'Settings'   },
 
@@ -31,8 +32,8 @@ const translations = {
   col_material:     { cs: 'Materiál',     en: 'Material'       },
   badge_foreign:    { cs: 'Zahraničí',    en: 'Foreign'        },
   email_tooltip:    { cs: 'Kontakt souhlasí se zasíláním marketingových e-mailů. Hromadný e-mail se odešle jen těmto kontaktům.', en: 'Contact agreed to receive marketing e-mails. Bulk e-mail will only be sent to these contacts.' },
-  send_sms:         { cs: '📱 Poslat SMS',     en: '📱 Send SMS'      },
-  send_email:       { cs: '📧 Poslat e-mail',  en: '📧 Send e-mail'   },
+  send_sms:         { cs: 'Poslat SMS',     en: 'Send SMS'      },
+  send_email:       { cs: 'Poslat e-mail',  en: 'Send e-mail'   },
   contacts_import:  { cs: '⬆ Import z Excelu', en: '⬆ Import Excel'   },
   sms_tooltip:      { cs: 'Kontakt souhlasí s přijímáním SMS upozornění o výkupech. Hromadná SMS se odešle jen těmto kontaktům.', en: 'Contact agreed to receive SMS purchase notifications. Bulk SMS will only be sent to these contacts.' },
   contacts_empty_msg: { cs: 'Žádné kontakty neodpovídají filtru', en: 'No contacts match the filter' },

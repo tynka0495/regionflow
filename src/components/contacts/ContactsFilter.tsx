@@ -5,8 +5,9 @@ import { t } from '../../lib/i18n';
 import './ContactsFilter.css';
 
 interface ContactsFilterProps {
-  search: string;
-  onSearchChange: (v: string) => void;
+  // Omit both to hide the search box.
+  search?: string;
+  onSearchChange?: (v: string) => void;
   filterRegion: RegionCode | '';
   onRegionChange: (v: RegionCode | '') => void;
   filterCountry: Country | '';
@@ -27,7 +28,7 @@ export function ContactsFilter({
   const hasFilters = search || filterRegion || filterCountry || filterMaterial;
 
   const clearAll = () => {
-    onSearchChange('');
+    onSearchChange?.('');
     onRegionChange('');
     onCountryChange('');
     onMaterialChange('');
@@ -35,16 +36,18 @@ export function ContactsFilter({
 
   return (
     <div className="contacts-filter card">
-      <div className="filter-search">
-        <span className="filter-search-icon">🔍</span>
-        <input
-          type="text"
-          placeholder={t('filter_search_ph', lang)}
-          value={search}
-          onChange={e => onSearchChange(e.target.value)}
-          className="filter-input"
-        />
-      </div>
+      {onSearchChange && (
+        <div className="filter-search">
+          <span className="filter-search-icon">🔍</span>
+          <input
+            type="text"
+            placeholder={t('filter_search_ph', lang)}
+            value={search}
+            onChange={e => onSearchChange(e.target.value)}
+            className="filter-input"
+          />
+        </div>
+      )}
 
       <div className="filter-selects">
         <select
